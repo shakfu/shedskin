@@ -230,19 +230,21 @@ class ShedskinStatsManager:
 
     def print_rows(self, rows: list[tuple[str, int, int, float, float, float]]) -> None:
         """Print rows of statistics"""
+        print()
         max_name_len = max(len(row[0]) for row in rows)
         print(
             "NAME".ljust(max_name_len + 1),
-            "WORDS".rjust(5),
-            "SLOC".rjust(4),
-            "STIME".rjust(5),
-            "BTIME".rjust(5),
-            "RTIME".rjust(5),
+            "WORDS".ljust(5),
+            "SLOC".ljust(4),
+            "PREBUILD".ljust(5),
+            "BUILD".ljust(5),
+            "RUN".ljust(5),
         )
         for name, n_words, sloc, prebuild_secs, build_secs, run_secs in rows:
             print(
-                f"{name:<{max_name_len + 1}} {n_words:<5} {sloc:<4} {prebuild_secs:<5.1f} {build_secs:<5.1f} {run_secs:<5.1f}"
+                f"{name:<{max_name_len + 1}} {n_words:<5} {sloc:<4} {prebuild_secs:<8.1f} {build_secs:<5.1f} {run_secs:<4.1f}"
             )
+        print()
 
     def print_latest_stats(self) -> None:
         """Print the statistics of the most recent run."""
