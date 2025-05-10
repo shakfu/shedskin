@@ -1,4 +1,5 @@
-.PHONY: all build tests examples sync clean reset
+.PHONY: all build tests test tests-conan examples examples-conan \
+		sync clean reset
 
 all: build
 
@@ -10,8 +11,14 @@ tests:
 
 test: tests
 
+tests-conan:
+	@cd tests && uv run shedskin test --conan
+
 examples:
 	@cd examples && uv run shedskin test
+
+examples-conan:
+	@cd examples && uv run shedskin test --conan
 
 clean:
 	@rm -rf build dist
