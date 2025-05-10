@@ -42,12 +42,15 @@ jobs:
     - name: Sync uv
       run: uv sync
 
+    - name: Add conan
+      run: uv add conan==1.62.0
+
     - name: Test shedskin
       run: |
         cd tests
-        uv run shedskin test --spm
+        uv run shedskin test --conan
 
     - name: Test shedskin examples
       run: |
         cd examples
-        uv run shedskin test --spm
+        uv run shedskin test --conan
