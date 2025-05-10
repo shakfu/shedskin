@@ -1,26 +1,22 @@
 # os x related
 .DS_Store
 
-# python related
-__pycache__
-*.py[co]
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
 
 # docs
 docs/_build/
-
 
 # build related (exception for lib/ folders)
 *.so
 *.so.dSYM
 *.[hc]pp !lib/*.[hc]pp
-Makefile*
 
-# exclude build related files and folders
-build/
-dist/
-
-# setup.py related
-*.egg-info/
 
 # poetry related
 poetry.lock
@@ -35,7 +31,8 @@ test.*
 .ruff_cache/
 .mypy_cache/
 
-# virtualenv named 'venv' in case it is in-source
+# Virtual environments
+.venv
 venv
 
 # shedsksin specific

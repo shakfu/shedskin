@@ -60,7 +60,7 @@ dev = [
 shedskin = 'shedskin.__main__:run'
 
 [build-system]
-requires = ["poetry-core"]
+requires = ["poetry-core>=2,<3"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.urls]
