@@ -45,9 +45,9 @@ jobs:
     - name: Test shedskin
       run: |
         cd tests
-        uv run shedskin test --conan
+        uv run shedskin test --spm
 
     - name: Test shedskin examples
       run: |
         cd examples
-        uv run shedskin test --conan
+        uv run shedskin test --spm
