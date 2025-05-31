@@ -1,3 +1,6 @@
+# uv related (for now)
+uv.lock
+
 # os x related
 .DS_Store
 
@@ -37,6 +40,7 @@ test.*
 
 # virtualenv named 'venv' in case it is in-source
 venv
+.venv
 
 # shedsksin specific
 *.ss.py
