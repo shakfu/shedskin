@@ -313,7 +313,8 @@ class ShedskinDependencyManager:
 
     def install_pcre(self) -> None:
         """Download / build / install pcre"""
-        pcre_repo = "https://github.com/luvit/pcre.git"
+        # using fork due to cmake compat issue
+        pcre_repo = "https://github.com/shakfu/pcre.git"
         pcre_src = self.src_dir / "pcre"
         pcre_build = pcre_src / "build"
         print("download / build / install pcre")
