@@ -2540,11 +2540,9 @@ class GenerateVisitor(ast_utils.BaseNodeVisitor):
             or ast_utils.is_none(left)
             or ast_utils.is_none(right)
         ):  # XXX not middle, cleanup?
-            self.append("(")
             self.visit2(left, argtypes, middle, func)
             self.append(inline)
             self.visit2(right, argtypes, middle, func)
-            self.append(")")
             return
 
         # --- prefix '!'
@@ -3439,15 +3437,28 @@ class GenerateVisitor(ast_utils.BaseNodeVisitor):
                         if not ast_utils.is_constant(child) and not ast_utils.is_none(
                             child
                         ):
-                            self.start(self.mv.tempcount[child] + " = ")
+                            # Prevent self-assignment warnings - check if child is a temp variable
+                            temp_var = self.mv.tempcount[child]
+                            if (isinstance(child, ast.Name) and
+                                child.id == temp_var):
+                                # Skip self-assignment
+                                continue
+                            self.start(temp_var + " = ")
                             self.visit(child, func)
                             self.eol()
             elif not ast_utils.is_constant(node.value) and not ast_utils.is_none(
                 node.value
             ):
-                self.start(self.mv.tempcount[node.value] + " = ")
-                self.visit(node.value, func)
-                self.eol()
+                # Prevent self-assignment warnings
+                temp_var = self.mv.tempcount[node.value]
+                if (isinstance(node.value, ast.Name) and
+                    node.value.id == temp_var):
+                    # Skip self-assignment
+                    pass
+                else:
+                    self.start(temp_var + " = ")
+                    self.visit(node.value, func)
+                    self.eol()
 
         # a = (b,c) = .. = expr
         for left in node.targets:

@@ -50,3 +50,8 @@ shedskin/lib/serial.py
 
 # editor or ide
 .vscode
+
+# claude
+.claude
+CLAUDE.md
+

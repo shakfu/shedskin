@@ -482,7 +482,7 @@ __ss_bool bytes::endswith(bytes *s, __ss_int start, __ss_int end) {
 bytes *bytes::removeprefix(bytes *prefix) {
     size_t l = prefix->unit.size();
     if(startswith(prefix))
-        return new bytes(unit.data()+l, unit.size()-l);
+        return new bytes(unit.data()+l, static_cast<int>(unit.size()-l));
     else
         return this;
 }
@@ -490,7 +490,7 @@ bytes *bytes::removeprefix(bytes *prefix) {
 bytes *bytes::removesuffix(bytes *suffix) {
     size_t l = suffix->unit.size();
     if(endswith(suffix))
-        return new bytes(unit.data(), unit.size()-l);
+        return new bytes(unit.data(), static_cast<int>(unit.size()-l));
     else
         return this;
 }

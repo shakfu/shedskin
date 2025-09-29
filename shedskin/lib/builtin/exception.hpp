@@ -102,7 +102,7 @@ public:
 
     BaseException(str *msg=0);
 
-    void __init__(str *msg) {}
+    void __init__(str *msg) { (void)msg; }
     void __init__(void *) {}
     str *__repr__();
     str *__str__();
