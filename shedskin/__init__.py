@@ -18,6 +18,7 @@ import time
 from typing import List, Optional
 
 from . import cmake, config, cpp, error, graph, infer, log, makefile, stats
+from .subprocess_utils import run_executable, enable_windows_color_output
 
 
 class Shedskin:
@@ -245,13 +246,13 @@ class Shedskin:
             executable = cwd / 'build' / p.stem
         else:
             executable = cwd.parent / 'build' / p.parent.name / p.parent.name
-        os.system(executable)
+        run_executable(executable, check=False)
 
     @classmethod
     def commandline(cls, bypassargs:Optional[List[str]]=None) -> None:
         """command line api"""
         sys.setrecursionlimit(100000)
-        os.system("") # hack tht enables color output for Microsoft Windows cmd
+        enable_windows_color_output()  # Enable color output for Windows cmd
 
         # --- command-line options
         parser = argparse.ArgumentParser(

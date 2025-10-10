@@ -7,6 +7,8 @@ import logging
 import sys
 from typing import TYPE_CHECKING, Optional, Tuple, TypeAlias, Union
 
+from .exceptions import CompilationError
+
 if TYPE_CHECKING:
     from . import config, graph, python
 
@@ -49,7 +51,9 @@ def error(
         ERRORS.add(result)
     if not warning:
         print_error(result)
-        sys.exit(1)
+        # Convert node to AST node if needed for exception
+        ast_node = node if isinstance(node, ast.AST) else None
+        raise CompilationError(msg, ast_node)
 
 
 def print_error(error: Error) -> None:

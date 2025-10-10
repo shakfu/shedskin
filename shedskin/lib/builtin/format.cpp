@@ -2,7 +2,8 @@
 
 /* TODO use in str/bytes __repr__ */
 str *__escape_bytes(pyobj *p) {
-    bytes *t = (bytes *)p;
+    auto *t = dynamic_cast<bytes *>(p);
+    if (!t) return new str("");  // Type mismatch
 
     std::stringstream ss;
     __GC_STRING separator = "\\\n\r\t";

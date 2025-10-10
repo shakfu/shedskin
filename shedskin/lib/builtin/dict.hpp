@@ -187,7 +187,8 @@ template<class K, class V> PyObject *dict<K, V>::__to_py__() {
 #endif
 
 template<class K, class V> __ss_bool dict<K,V>::__eq__(pyobj *p) {
-    dict<K,V> *b = (dict<K,V> *)p;
+    auto *b = dynamic_cast<dict<K,V> *>(p);
+    if (!b) return False;
 
     if(b->__len__() != this->__len__())
         return False;

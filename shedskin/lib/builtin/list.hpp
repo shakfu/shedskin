@@ -148,20 +148,21 @@ template<class T> void list<T>::clear() {
 }
 
 template<class T> void list<T>::resize(__ss_int i) {
-    units.resize((size_t)i);
+    units.resize(static_cast<size_t>(i));
 }
 
 template<class T> __ss_int list<T>::__len__() {
-    return (__ss_int)units.size();
+    return static_cast<__ss_int>(units.size());
 }
 
 template<class T> T list<T>::__getitem__(__ss_int i) {
     i = __wrap(this, i);
-    return units[(size_t)i];
+    return units[static_cast<size_t>(i)];
 }
 
 template<class T> __ss_bool list<T>::__eq__(pyobj *p) {
-   list<T> *b = (list<T> *)p;
+   auto *b = dynamic_cast<list<T> *>(p);
+   if (!b) return False;
    size_t len = this->units.size();
    if(b->units.size() != len) return False;
    for(size_t i = 0; i < len; i++)

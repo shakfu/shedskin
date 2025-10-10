@@ -24,7 +24,7 @@ bytes::bytes(const char *s, int size, int frozen_) : unit(s, (size_t)size), hash
 }
 
 char *bytes::c_str() const {
-    return (char *)this->unit.c_str();
+    return const_cast<char *>(this->unit.c_str());
 }
 
 str *bytes::__str__() {
@@ -165,7 +165,8 @@ long bytes::__hash__() {
 }
 
 __ss_bool bytes::__eq__(pyobj *p) {
-    bytes *q = (bytes *)p;
+    auto *q = dynamic_cast<bytes *>(p);
+    if (!q) return False;
     size_t len = this->unit.size();
     if(len != q->unit.size() or (hash != -1 and q->hash != -1 and hash != q->hash))
         return False;

@@ -25,7 +25,7 @@ str *str::__str__() {
 }
 
 char *str::c_str() const {
-    return (char *)this->unit.c_str();
+    return const_cast<char *>(this->unit.c_str());
 }
 
 str *str::__repr__() {
@@ -459,7 +459,8 @@ str *str::center(__ss_int w, str *fillchar) {
 
 __ss_int str::__cmp__(pyobj *p) {
     if (!p) return 1;
-    str *b = (str *)p;
+    auto *b = dynamic_cast<str *>(p);
+    if (!b) return 1;  // Type mismatch, this > other
     int r = unit.compare(b->unit);
     if( r < 0 ) return -1;
     else if( r > 0 ) return 1;
@@ -467,7 +468,8 @@ __ss_int str::__cmp__(pyobj *p) {
 }
 
 __ss_bool str::__eq__(pyobj *p) {
-    str *q = (str *)p;
+    auto *q = dynamic_cast<str *>(p);
+    if (!q) return False;
     size_t len = this->unit.size();
     if(len != q->unit.size() or (hash != -1 and q->hash != -1 and hash != q->hash))
         return False;

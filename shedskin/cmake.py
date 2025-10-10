@@ -37,6 +37,7 @@ from typing import Callable, List, Optional, Union
 
 from . import config
 from .utils import CYAN, GREEN, RED, RESET, WHITE
+from .subprocess_utils import run_shell_command, assert_command_success
 
 # type alias
 Pathlike = Union[pathlib.Path, str]
@@ -144,7 +145,10 @@ class ConanDependencyManager:
 
     def install(self) -> None:
         """Install conan dependencies"""
-        os.system(f"cd {self.build_dir} && conan install .. --build=missing")
+        run_shell_command(
+            f"cd {self.build_dir} && conan install .. --build=missing",
+            check=False
+        )
 
 
 class ShedskinDependencyManager:
@@ -172,7 +176,7 @@ class ShedskinDependencyManager:
         """Run a shell command"""
         print("-" * 80)
         print(f"{WHITE}cmd{RESET}: {CYAN}{cmd}{RESET}")
-        os.system(cmd)  # .format(*args, **kwds))
+        run_shell_command(cmd, check=False)
 
     def git_clone(
         self, repo: str, to_dir: Pathlike, branch: Optional[str] = None
@@ -678,7 +682,7 @@ class CMakeBuilder:
         if generator:
             cfg_cmd += ' -G "{generator}"'
         self.log.info(cfg_cmd)
-        assert os.system(cfg_cmd) == 0
+        assert_command_success(cfg_cmd, shell=True)
 
     def cmake_build(self, options: list[str]) -> None:
         """Activate cmake build"""
@@ -686,7 +690,7 @@ class CMakeBuilder:
         bld_cmd = f"cmake --build {self.build_dir} {opts}"
         self.log.info(bld_cmd)
         print("bld_cmd:", bld_cmd)
-        assert os.system(bld_cmd) == 0
+        assert_command_success(bld_cmd, shell=True)
 
     def cmake_test(self, options: list[str]) -> None:
         """Activate ctest"""
@@ -698,7 +702,7 @@ class CMakeBuilder:
 
         tst_cmd = f"ctest {cfg} --output-on-failure {opts} --test-dir {self.build_dir}"
         self.log.info(tst_cmd)
-        assert os.system(tst_cmd) == 0
+        assert_command_success(tst_cmd, shell=True)
 
     def run_tests(self) -> None:
         """Run tests as a test runner"""
@@ -814,7 +818,7 @@ class CMakeBuilder:
             # nocleanup
 
             if self.options.pytest:
-                os.system("pytest")
+                run_shell_command("pytest", check=False)
 
             if self.options.run:
                 target_suffix = "-exe"

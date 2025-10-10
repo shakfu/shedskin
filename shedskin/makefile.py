@@ -36,6 +36,8 @@ import sysconfig
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Callable, Optional, TypeAlias
 
+from .subprocess_utils import run_shell_command
+
 if TYPE_CHECKING:
     from . import config, python
 
@@ -447,7 +449,7 @@ class Builder:
     def _execute(self, cmd: str) -> None:
         """Execute a command"""
         print(cmd)
-        os.system(cmd)
+        run_shell_command(cmd, check=False)
 
     def _remove(self, path: PathLike) -> None:
         """Remove a target"""
