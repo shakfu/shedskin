@@ -445,7 +445,15 @@ __all__ = ['CPPNamer', 'GenerateVisitor', 'generate_code']
   - All 114 unit tests pass
   - Basic and complex compilation tests pass
   - Committed: 6881c98b
-- [ ] **Phase 4**: Split Visitor - Statements (1 day)
+- [x] **Phase 4**: Split Visitor - Statements (1 day) ✅ COMPLETE
+  - Created cpp/statements.py with StatementVisitorMixin (646 lines)
+  - Extracted 22 statement visitor methods (633 lines)
+  - Methods include: For, While, If, Try, Assign, FunctionDef, Module, etc.
+  - GenerateVisitor now inherits from StatementVisitorMixin
+  - Reduced cpp.py from 2,959 to 2,326 lines (633 lines extracted)
+  - All 114 unit tests pass
+  - Basic and complex compilation tests pass
+  - Committed: [commit hash]
 - [ ] **Phase 5**: Extract Remaining Modules (1 day)
 - [ ] **Phase 6**: Final Integration (4 hours)
 
@@ -518,4 +526,4 @@ If issues arise during migration:
 
 **Author**: Claude (with human oversight)
 **Last Updated**: 2025-10-11
-**Status**: 🚀 In Progress - Phase 3 Complete (50% done)
+**Status**: 🚀 In Progress - Phase 4 Complete (67% done)
