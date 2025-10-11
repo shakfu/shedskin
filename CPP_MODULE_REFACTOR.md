@@ -420,7 +420,13 @@ __all__ = ['CPPNamer', 'GenerateVisitor', 'generate_code']
 - [ ] Create feature branch: `refactor/split-cpp-module`
 
 ### Migration (Incremental Approach)
-- [ ] **Phase 1**: Extract CPPNamer (2 hours)
+- [x] **Phase 1**: Extract CPPNamer (2 hours) ✅ COMPLETE
+  - Created cpp/ package structure
+  - Extracted CPPNamer to cpp/namer.py (86 lines)
+  - Reduced cpp.py from 4,389 to 4,323 lines (66 lines extracted)
+  - All 114 unit tests pass
+  - Basic and complex compilation tests pass
+  - Committed: 91402372
 - [ ] **Phase 2**: Extract Output Management (3 hours)
 - [ ] **Phase 3**: Split Visitor - Expressions (1 day)
 - [ ] **Phase 4**: Split Visitor - Statements (1 day)
@@ -496,4 +502,4 @@ If issues arise during migration:
 
 **Author**: Claude (with human oversight)
 **Last Updated**: 2025-10-11
-**Status**: ✅ Design Complete - Awaiting Approval
+**Status**: 🚀 In Progress - Phase 1 Complete

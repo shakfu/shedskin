@@ -5,8 +5,10 @@
 Refactored from monolithic cpp.py (4,389 lines) into focused modules.
 
 Phase 1: Extracted CPPNamer to cpp/namer.py
+Phase 2: Extracted OutputMixin to cpp/output.py
 """
 
 from .namer import CPPNamer
+from .output import OutputMixin
 
-__all__ = ['CPPNamer']
+__all__ = ['CPPNamer', 'OutputMixin']

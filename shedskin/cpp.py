@@ -48,7 +48,7 @@ from typing import (IO, TYPE_CHECKING, Any, Dict, Iterator, List, Optional,
 
 from . import (ast_utils, error, extmod, infer, makefile, python, typestr,
                virtual)
-from .cpp import CPPNamer
+from .cpp import CPPNamer, OutputMixin
 
 if TYPE_CHECKING:
     from . import config
@@ -64,7 +64,7 @@ AllParent: TypeAlias = Union["python.Class", "python.Function", "python.StaticCl
 # --- code generation visitor; use type information
 
 
-class GenerateVisitor(ast_utils.BaseNodeVisitor):
+class GenerateVisitor(OutputMixin, ast_utils.BaseNodeVisitor):
     """Visitor for generating C++ code from Python ASTs"""
 
     def __init__(
@@ -91,113 +91,7 @@ class GenerateVisitor(ast_utils.BaseNodeVisitor):
         """Generate a C++ name for an object"""
         return self.namer.name(obj)
 
-    def get_output_file(self, ext: str = ".cpp", mode: str = "w") -> IO[Any]:
-        """Get an output file for writing C++ code"""
-        if self.analyze:
-            return io.StringIO()
-        output_file = Path(self.output_base.with_suffix(ext))
-        assert self.gx.module_path
-        module_path = Path(self.gx.module_path)
-        if self.gx.outputdir:
-            outputdir = Path(self.gx.outputdir)
-            output_file = outputdir / output_file.relative_to(module_path.parent)
-            output_file.parent.mkdir(exist_ok=True)
-        return open(output_file, mode)
-
-    def insert_consts(self, declare: bool) -> None:  # XXX ugly
-        """Insert constant declarations into the output file"""
-        if not self.consts:
-            return
-        self.filling_consts = True
-
-        if declare:
-            suffix = ".hpp"
-        else:
-            suffix = ".cpp"
-
-        with self.get_output_file(ext=suffix, mode="r") as f:
-            lines = f.readlines()
-        newlines = []
-        j = -1
-        for i, line in enumerate(lines):
-            if line.startswith("namespace ") and "XXX" not in line:  # XXX
-                j = i + 1
-            newlines.append(line)
-
-            if i == j:
-                pairs = []
-                done = set()
-                for node, name in self.consts.items():
-                    if (
-                        name not in done
-                        and node in self.mergeinh
-                        and self.mergeinh[node]
-                    ):  # XXX
-                        ts = typestr.nodetypestr(
-                            self.gx, node, infer.inode(self.gx, node).parent, mv=self.mv
-                        )
-                        if declare:
-                            ts = "extern " + ts
-                        pairs.append((ts, name))
-                        done.add(name)
-
-                newlines.extend(self.group_declarations(pairs))
-                newlines.append("\n")
-
-        newlines2 = []
-        j = -1
-        for i, line in enumerate(newlines):
-            if line.startswith("void __init() {"):
-                j = i
-            newlines2.append(line)
-
-            if i == j:
-                todo = {}
-                for node, name in self.consts.items():
-                    if name not in todo:
-                        todo[int(name[6:])] = node
-                todolist = list(todo)
-                todolist.sort()
-                for number in todolist:
-                    if self.mergeinh[todo[number]]:  # XXX
-                        name = "const_" + str(number)
-                        self.start("    " + name + " = ")
-                        if (
-                            isinstance(todo[number], ast.Str)
-                            and len(todo[number].s.encode("utf-8")) == 1
-                        ):
-                            self.append("__char_cache[%d]" % ord(todo[number].s))
-                        elif (
-                            isinstance(todo[number], ast.Bytes)
-                            and len(todo[number].s) == 1
-                        ):
-                            self.append("__byte_cache[%d]" % ord(todo[number].s))
-                        else:
-                            self.visit(
-                                todo[number], infer.inode(self.gx, todo[number]).parent
-                            )
-                        newlines2.append(self.line + ";\n")
-
-                newlines2.append("\n")
-
-        with self.get_output_file(ext=suffix, mode="w") as f:
-            f.writelines(newlines2)
-        self.filling_consts = False
-
-    def insert_extras(self, suffix: str) -> None:
-        """Insert extra lines into the output file"""
-        with self.get_output_file(ext=suffix, mode="r") as f:
-            lines = f.readlines()
-        # lines = open(self.output_base + suffix, 'r').readlines()
-        newlines = []
-        for line in lines:
-            newlines.append(line)
-            if suffix == ".cpp" and line.startswith("#include"):
-                newlines.extend(self.include_files())
-            elif suffix == ".hpp" and line.startswith("using namespace"):
-                newlines.extend(self.fwd_class_refs())
-        with self.get_output_file(ext=suffix, mode="w") as f:
-            f.writelines(newlines)
+    # Output methods (get_output_file, insert_consts, insert_extras) moved to cpp/output.py
 
     def fwd_class_refs(self) -> list[str]:
         """Forward declare classes from included modules"""
@@ -279,42 +173,7 @@ class GenerateVisitor(ast_utils.BaseNodeVisitor):
         self.visit(self.module.ast, True)
         self.out.close()
 
-    def print(self, text: Optional[str] = None) -> None:
-        """Print text to the output file"""
-        if text is not None:
-            print(text, file=self.out)
-        else:
-            print(file=self.out)
-
-    def output(self, text: str) -> None:
-        """Output text to the output file"""
-        if text:
-            self.print(self.indentation + text)
-
-    def start(self, text: Optional[str] = None) -> None:
-        """Start a new line in the output file"""
-        self.line = self.indentation
-        if text:
-            self.line += text
-
-    def append(self, text: str) -> None:
-        """Append text to the current line in the output file"""
-        self.line += text
-
-    def eol(self, text: Optional[str] = None) -> None:
-        """End the current line in the output file"""
-        if text:
-            self.append(text)
-        if self.line.strip():
-            self.print(self.line + ";")
-
-    def indent(self) -> None:
-        """Indent the current line in the output file"""
-        self.indentation += 4 * " "
-
-    def deindent(self) -> None:
-        """Deindent the current line in the output file"""
-        self.indentation = self.indentation[:-4]
+    # Output buffer methods (print, output, start, append, eol, indent, deindent) moved to cpp/output.py
 
     def visitm(self, *args: Any) -> None:
         """Visit multiple nodes in the output file"""
