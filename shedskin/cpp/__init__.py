@@ -10,5 +10,6 @@ Phase 2: Extracted OutputMixin to cpp/output.py
 
 from .namer import CPPNamer
 from .output import OutputMixin
+from .expressions import ExpressionVisitorMixin
 
-__all__ = ['CPPNamer', 'OutputMixin']
+__all__ = ['CPPNamer', 'OutputMixin', 'ExpressionVisitorMixin']
