@@ -37,7 +37,7 @@ def run_command(
     check: bool = True,
     cwd: Optional[PathLike] = None,
     capture_output: bool = False,
-) -> subprocess.CompletedProcess:
+) -> subprocess.CompletedProcess[str]:
     """Run a command safely using subprocess.run().
 
     Args:
