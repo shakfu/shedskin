@@ -11,8 +11,10 @@ This module contains helper methods including:
 import ast
 from typing import TYPE_CHECKING, Any, List, Optional, Tuple, TypeAlias, Union
 
+from .. import python, typestr
+
 if TYPE_CHECKING:
-    from .. import python
+    pass
 
 Types: TypeAlias = set[Tuple["python.Class", int]]
 

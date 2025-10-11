@@ -8,8 +8,10 @@ This module contains visitor methods for Python expression AST nodes.
 import ast
 from typing import TYPE_CHECKING, Any, Dict, Iterator, List, Optional, Tuple, TypeAlias, Union
 
+from .. import error, infer, python, typestr
+
 if TYPE_CHECKING:
-    from .. import python
+    pass
 
 # Type aliases (from cpp.py)
 Types: TypeAlias = set[Tuple["python.Class", int]]

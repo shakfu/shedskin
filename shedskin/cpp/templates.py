@@ -11,8 +11,10 @@ This module contains methods for type checking and template handling:
 import ast
 from typing import TYPE_CHECKING, Any, Optional, Tuple, TypeAlias
 
+from .. import infer, python, typestr
+
 if TYPE_CHECKING:
-    from .. import python
+    pass
 
 Types: TypeAlias = set[Tuple["python.Class", int]]
 
