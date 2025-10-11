@@ -469,7 +469,7 @@ __all__ = ['CPPNamer', 'GenerateVisitor', 'generate_code']
   - Total extracted across all phases: 3,449 lines (79% reduction from original 4,389 lines)
   - All 114 unit tests pass
   - Basic compilation tests pass
-  - Committed: [commit hash]
+  - Committed: 35edee29
 - [ ] **Phase 6**: Final Integration (4 hours)
 
 ### Post-Migration
