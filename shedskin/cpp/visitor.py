@@ -1,39 +1,51 @@
 # SHED SKIN Python-to-C++ Compiler
 # Copyright 2005-2024 Mark Dufour and contributors; GNU GPL version 3 (See LICENSE)
-"""shedskin.cpp: C++ Code Generator
+"""shedskin.cpp.visitor - GenerateVisitor and base visitor methods
 
-This module is responsible for translating Python code into equivalent C++ code,
-handling all aspects of code generation including:
+This module contains the GenerateVisitor class, which is the main entry point
+for C++ code generation. It composes all the mixin classes from the cpp package
+to provide a complete visitor for translating Python AST to C++ code.
 
-Key Components:
-- `GenerateVisitor`: Main code generation class that traverses the Python AST
-  and outputs corresponding C++ code. Inherits visitor pattern from
-  `ast_utils.BaseNodeVisitor` to recursively generate C++ code for each
-  syntactical Python construct. 
-- `CPPNamer`: Handles C++ identifier naming and keyword conflicts.
-- `TypeExpr`: Manages C++ template type expressions.
-- `InstanceAllocator`: Handles object allocation and memory management.
+GenerateVisitor
+===============
 
-Major Features:
-- Template-based polymorphism for Python's dynamic typing.
-- Virtual method tables for inheritance and method dispatch.
-- Reference counting and garbage collection integration.
-- Python builtin type implementations
-- Exception handling translation
-- Module system and import handling
-- Standard library implementations
+The GenerateVisitor class inherits from multiple mixins:
+- TemplateMixin: Type checking and casting utilities
+- DeclarationMixin: Header and declaration generation
+- HelperMixin: Specialized code generators (loops, comparisons, lambdas)
+- StatementVisitorMixin: Statement visitor methods (for, if, assign, etc.)
+- ExpressionVisitorMixin: Expression visitor methods (call, binop, name, etc.)
+- OutputMixin: Output buffer management
+- BaseNodeVisitor: Base AST visitor pattern
 
-The code generation process:
-1. Constraint graph, with inferred types, is first 'merged' back to program
-   dimensions (`gx.merged_inh`).
-2. AST is traversed to generate C++ declarations and definitions.
-3. Template specializations are generated for polymorphic functions.
-4. Virtual method tables are created for class hierarchies.
-5. Boilerplate code is added for Python integration.
+Base Methods
+============
 
-Generated code aims to balance performance with Python semantics,
-using C++ features like templates and virtuals where appropriate
-while maintaining Python's dynamic behavior.
+This module also contains base visitor methods that don't fit into
+specific categories:
+- visitm(): Visit multiple nodes
+- connector(): Get connector string (:: or -> or .)
+- get_constant(): Get constant name
+- rich_comparison(): Generate rich comparison functions
+- module_cpp(): Generate module implementation file
+- impl_visit_conv(): Convert/cast nodes
+- impl_visit_and_or(): Handle and/or operations
+- impl_visit_bitop(): Handle bitwise operations
+- impl_visit_binary(): Handle binary operations
+- impl_visit_mod(): Handle modulo operations
+- power(): Handle power operations
+- visit2(): Generic visit with type info
+- library_func(): Check if function is from library
+- add_args_arg(): Add arguments to call
+- bool_test(): Generate boolean test
+- tuple_assign(): Generate tuple assignment
+- subs_assign(): Generate subscript assignment
+- struct_unpack_cpp(): Generate struct unpacking
+- assign_pair(): Generate assignment pair
+- get_selector(): Get selector for tuple/list item
+- rec_string_addition(): Recursively handle string addition
+- attr_var_ref(): Generate attribute variable reference
+- expand_special_chars(): Expand special characters in strings
 """
 
 import ast
@@ -46,12 +58,12 @@ from pathlib import Path
 from typing import (IO, TYPE_CHECKING, Any, Dict, Iterator, List, Optional,
                     Tuple, TypeAlias, Union)
 
-from . import (ast_utils, error, extmod, infer, makefile, python, typestr,
-               virtual)
-from .cpp import CPPNamer, OutputMixin, ExpressionVisitorMixin, StatementVisitorMixin, HelperMixin, DeclarationMixin, TemplateMixin
+from .. import (ast_utils, error, extmod, infer, makefile, python, typestr,
+                virtual)
+from . import CPPNamer, OutputMixin, ExpressionVisitorMixin, StatementVisitorMixin, HelperMixin, DeclarationMixin, TemplateMixin
 
 if TYPE_CHECKING:
-    from . import config
+    from .. import config
 
 Types: TypeAlias = set[Tuple["python.Class", int]]
 Parent: TypeAlias = Union["python.Class", "python.Function"]

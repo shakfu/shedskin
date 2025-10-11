@@ -165,6 +165,8 @@ Design Principles
 5. **Zero Behavioral Changes**: Generated C++ code identical to original
 """
 
+from typing import TYPE_CHECKING
+
 from .namer import CPPNamer
 from .output import OutputMixin
 from .expressions import ExpressionVisitorMixin
@@ -172,5 +174,48 @@ from .statements import StatementVisitorMixin
 from .helpers import HelperMixin
 from .declarations import DeclarationMixin
 from .templates import TemplateMixin
+from .visitor import GenerateVisitor
 
-__all__ = ['CPPNamer', 'OutputMixin', 'ExpressionVisitorMixin', 'StatementVisitorMixin', 'HelperMixin', 'DeclarationMixin', 'TemplateMixin']
+if TYPE_CHECKING:
+    from .. import config
+
+__all__ = [
+    'CPPNamer',
+    'OutputMixin',
+    'ExpressionVisitorMixin',
+    'StatementVisitorMixin',
+    'HelperMixin',
+    'DeclarationMixin',
+    'TemplateMixin',
+    'GenerateVisitor',
+    'generate_code',
+]
+
+
+def generate_code(gx: "config.GlobalInfo", analyze: bool = False) -> None:
+    """Generate C++ code for all modules.
+
+    This is the main entry point for C++ code generation. It creates a
+    GenerateVisitor for each module and generates both .cpp and .hpp files.
+
+    Args:
+        gx: GlobalInfo containing type inference results and modules
+        analyze: If True, only analyze without writing files
+
+    Process:
+        1. Create GenerateVisitor for each non-builtin module
+        2. Visit module AST to generate implementation (.cpp)
+        3. Generate header file (.hpp)
+        4. Insert constants and extras into both files
+    """
+    for module in gx.modules.values():
+        if not module.builtin:
+            gv = GenerateVisitor(gx, module, analyze)
+            gv.visit(module.ast)
+            gv.out.close()
+            gv.header_file()
+            gv.out.close()
+            gv.insert_consts(declare=False)
+            gv.insert_consts(declare=True)
+            gv.insert_extras(".hpp")
+            gv.insert_extras(".cpp")

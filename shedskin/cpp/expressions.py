@@ -13,6 +13,7 @@ if TYPE_CHECKING:
 
 # Type aliases (from cpp.py)
 Types: TypeAlias = set[Tuple["python.Class", int]]
+Parent: TypeAlias = Union["python.Class", "python.Function"]
 
 
 class ExpressionVisitorMixin:
@@ -1039,22 +1040,6 @@ class ExpressionVisitorMixin:
         else:
             assert False
 
-
-def generate_code(gx: "config.GlobalInfo", analyze: bool = False) -> None:
-    """Generate code for a module"""
-    for module in gx.modules.values():
-        if not module.builtin:
-            gv = GenerateVisitor(gx, module, analyze)
-            gv.visit(module.ast)
-            gv.out.close()
-            gv.header_file()
-            gv.out.close()
-            gv.insert_consts(declare=False)
-            gv.insert_consts(declare=True)
-            gv.insert_extras(".hpp")
-            gv.insert_extras(".cpp")
-    # if not analyze:
-    #     makefile.generate_makefile(gx)
     def visit_List(
         self,
         node: ast.List,
