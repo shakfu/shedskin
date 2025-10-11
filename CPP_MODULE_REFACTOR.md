@@ -436,7 +436,15 @@ __all__ = ['CPPNamer', 'GenerateVisitor', 'generate_code']
   - All 114 unit tests pass
   - Basic and complex compilation tests pass
   - Committed: ede504cf
-- [ ] **Phase 3**: Split Visitor - Expressions (1 day)
+- [x] **Phase 3**: Split Visitor - Expressions (1 day) ✅ COMPLETE
+  - Created cpp/expressions.py with ExpressionVisitorMixin (1,236 lines)
+  - Extracted 24 expression visitor methods (~1,223 lines)
+  - Methods include: BinOp, UnaryOp, Call, Attribute, Name, Constant, comprehensions, etc.
+  - GenerateVisitor now inherits from ExpressionVisitorMixin
+  - Reduced cpp.py from 4,182 to 2,959 lines (1,223 lines extracted)
+  - All 114 unit tests pass
+  - Basic and complex compilation tests pass
+  - Committed: 6881c98b
 - [ ] **Phase 4**: Split Visitor - Statements (1 day)
 - [ ] **Phase 5**: Extract Remaining Modules (1 day)
 - [ ] **Phase 6**: Final Integration (4 hours)
@@ -510,4 +518,4 @@ If issues arise during migration:
 
 **Author**: Claude (with human oversight)
 **Last Updated**: 2025-10-11
-**Status**: 🚀 In Progress - Phase 2 Complete (33% done)
+**Status**: 🚀 In Progress - Phase 3 Complete (50% done)
