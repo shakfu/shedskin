@@ -10,11 +10,19 @@ GlobalInfo into focused, maintainable components.
 """
 
 import argparse
+import ast
 import os
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Optional
+from typing import TYPE_CHECKING, Any, List, Optional, Set, Tuple, TypeAlias, Union
+
+if TYPE_CHECKING:
+    from . import infer, python
+    from .utils import ProgressBar
+
+# Type aliases
+CartesianProduct: TypeAlias = Tuple[Tuple["python.Class", int], ...]
 
 
 @dataclass(frozen=True)
@@ -178,6 +186,103 @@ class CompilerPaths:
         illegal_file_path = self.shedskin_illegal / "illegal.txt"
         with open(illegal_file_path) as f:
             return {line.strip() for line in f}
+
+
+@dataclass
+class CompilerState:
+    """Mutable state during compilation.
+
+    This class holds all the runtime state that changes during
+    the compilation process, including type inference data, discovered
+    entities, and code generation state.
+    """
+
+    # Type inference data
+    constraints: Set[Tuple["infer.CNode", "infer.CNode"]] = field(default_factory=set)
+    cnode: dict[Tuple[Any, int, int], "infer.CNode"] = field(default_factory=dict)
+    types: dict["infer.CNode", Set[Tuple[Any, int]]] = field(default_factory=dict)
+    orig_types: dict["infer.CNode", Set[Tuple[Any, int]]] = field(default_factory=dict)
+
+    # Discovered entities
+    allvars: Set["python.Variable"] = field(default_factory=set)
+    allfuncs: Set["python.Function"] = field(default_factory=set)
+    allclasses: Set["python.Class"] = field(default_factory=set)
+
+    # Module tracking
+    modules: dict[str, "python.Module"] = field(default_factory=dict)
+    main_module: Optional["python.Module"] = None
+    module: Optional["python.Module"] = None
+
+    # AST relationships and tracking
+    inheritance_relations: dict[
+        Union["python.Function", ast.AST],
+        List[Union["python.Function", ast.AST]]
+    ] = field(default_factory=dict)
+    inheritance_temp_vars: dict["python.Variable", List["python.Variable"]] = field(
+        default_factory=dict
+    )
+    parent_nodes: dict[ast.AST, ast.AST] = field(default_factory=dict)
+    inherited: Set[ast.AST] = field(default_factory=set)
+    assign_target: dict[ast.AST, ast.AST] = field(default_factory=dict)
+    from_module: dict[ast.AST, "python.Module"] = field(default_factory=dict)
+
+    # Allocation site tracking
+    alloc_info: dict[
+        Tuple[str, CartesianProduct, ast.AST], Tuple["python.Class", int]
+    ] = field(default_factory=dict)
+    new_alloc_info: dict[
+        Tuple[str, CartesianProduct, ast.AST], Tuple["python.Class", int]
+    ] = field(default_factory=dict)
+
+    # Code generation state
+    templates: int = 0
+    lambdawrapper: dict[Any, str] = field(default_factory=dict)
+    cpp_keywords: Set[str] = field(default_factory=set)
+    ss_prefix: str = "__ss_"
+    list_types: dict[Tuple[int, ast.AST], int] = field(default_factory=dict)
+    tempcount: dict[Any, str] = field(default_factory=dict)
+
+    # AST transformation tracking
+    item_rvalue: dict[ast.AST, ast.AST] = field(default_factory=dict)
+    genexp_to_lc: dict[ast.GeneratorExp, ast.ListComp] = field(default_factory=dict)
+    setcomp_to_lc: dict[ast.SetComp, ast.ListComp] = field(default_factory=dict)
+    dictcomp_to_lc: dict[ast.DictComp, ast.ListComp] = field(default_factory=dict)
+    bool_test_only: Set[ast.AST] = field(default_factory=set)
+    called: Set[ast.Attribute] = field(default_factory=set)
+    struct_unpack: dict[
+        ast.Assign, Tuple[List[Tuple[str, str, str, int]], str, str]
+    ] = field(default_factory=dict)
+    augment: Set[ast.AST] = field(default_factory=set)
+
+    # Compilation progress tracking
+    iterations: int = 0
+    total_iterations: int = 0
+    import_order: int = 0
+    class_def_order: int = 0
+
+    # Type inference algorithm state (from infer.py)
+    added_allocs: int = 0
+    added_allocs_set: Set[Any] = field(default_factory=set)
+    added_funcs: int = 0
+    added_funcs_set: Set["python.Function"] = field(default_factory=set)
+    cpa_clean: bool = False
+    cpa_limit: int = 0
+    cpa_limited: bool = False
+    merged_inh: dict[Any, Set[Tuple[Any, int]]] = field(default_factory=dict)
+
+    # Control flow tracking
+    loopstack: List[Union[ast.While, ast.For]] = field(default_factory=list)
+
+    # Built-in types (immutable list used during compilation)
+    builtins: List[str] = field(default_factory=lambda: [
+        "none", "str_", "bytes_", "float_", "int_", "class_",
+        "list", "tuple", "tuple2", "dict", "set", "frozenset", "bool_"
+    ])
+
+    # UI and progress tracking
+    maxhits: int = 0
+    terminal: Optional[Any] = None
+    progressbar: Optional["ProgressBar"] = None
 
 
 def get_pkg_path() -> Path:

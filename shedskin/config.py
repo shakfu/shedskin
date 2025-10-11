@@ -3,143 +3,88 @@
 """shedskin.config: contains the main shedskin global configuration class
 
 `GlobalInfo` which is referred to in shedskin as `gx`.
+
+This module is transitioning to use the refactored compiler_config module
+for better separation of concerns. The GlobalInfo class now composes:
+- CompilerOptions (immutable configuration)
+- CompilerPaths (file system paths)
+- CompilerState (mutable runtime state)
 """
 
 import argparse
-import os
 import platform
-import sys
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, List, Optional, Tuple, TypeAlias, Union
+from typing import TYPE_CHECKING, Any
+
+from .compiler_config import (
+    CompilerOptions,
+    CompilerPaths,
+    CompilerState,
+    get_pkg_path,
+    get_user_cache_dir,
+)
 
 if TYPE_CHECKING:
-    import ast
-
-    from . import infer, python
     from .utils import ProgressBar
-
-# types aliases
-CartesianProduct: TypeAlias = Tuple[Tuple["python.Class", int], ...]
 
 # constants
 PLATFORM = platform.system()
 
 
 # classes
-class GlobalInfo:  # XXX add comments, split up
-    """Global configuration and state for the shedskin compiler"""
+class GlobalInfo:
+    """Global configuration and state for the shedskin compiler.
+
+    This class is being refactored to separate concerns. It now composes:
+    - options: CompilerOptions (immutable configuration)
+    - paths: CompilerPaths (file system paths)
+    - state: CompilerState (mutable runtime state)
+
+    For backward compatibility, all attributes are accessible directly
+    on the GlobalInfo instance via property delegation.
+    """
 
     def __init__(self, options: argparse.Namespace):
+        """Initialize GlobalInfo with refactored components.
+
+        Args:
+            options: Parsed command-line arguments
+        """
+        # Store original options namespace for compatibility
         self.options = options
-        self.constraints: set[tuple["infer.CNode", "infer.CNode"]] = set()
-        self.allvars: set["python.Variable"] = set()
-        self.allfuncs: set["python.Function"] = set()
-        self.allclasses: set["python.Class"] = set()
-        self.cnode: dict[Tuple[Any, int, int], "infer.CNode"] = {}
-        self.types: dict["infer.CNode", set[Tuple[Any, int]]] = {}
-        self.orig_types: dict["infer.CNode", set[Tuple[Any, int]]] = {}
-        self.templates: int = 0
-        self.modules: dict[str, "python.Module"] = {}
-        self.inheritance_relations: dict[
-            Union["python.Function", "ast.AST"],
-            List[Union["python.Function", "ast.AST"]],
-        ] = {}
-        self.inheritance_temp_vars: dict[
-            "python.Variable", List["python.Variable"]
-        ] = {}
-        self.parent_nodes: dict[ast.AST, ast.AST] = {}
-        self.inherited: set[ast.AST] = set()
-        self.main_module: "python.Module"
-        self.module: Optional["python.Module"] = None
-        self.module_path: Optional[Path] = None
-        self.cwd: Path = Path.cwd()
-        self.builtins: list[str] = [
-            "none",
-            "str_",
-            "bytes_",
-            "float_",
-            "int_",
-            "class_",
-            "list",
-            "tuple",
-            "tuple2",
-            "dict",
-            "set",
-            "frozenset",
-            "bool_",
-        ]
-        # instance node for instance Variable assignment
-        self.assign_target: dict[ast.AST, ast.AST] = {}
-        # allocation site type information across iterations
-        self.alloc_info: dict[
-            Tuple[str, CartesianProduct, ast.AST], Tuple["python.Class", int]
-        ] = {}
-        self.new_alloc_info: dict[
-            Tuple[str, CartesianProduct, ast.AST], Tuple["python.Class", int]
-        ] = {}
-        self.iterations: int = 0
-        self.total_iterations: int = 0
-        self.lambdawrapper: dict[Any, str] = {}
-        self.init_directories()
-        illegal_file = open(self.shedskin_illegal / "illegal.txt")
-        self.cpp_keywords = set(line.strip() for line in illegal_file)
-        self.ss_prefix: str = "__ss_"
-        self.list_types: dict[Tuple[int, ast.AST], int] = {}
-        self.loopstack: List[Union[ast.While, ast.For]] = []  # track nested loops
-        #        self.comments = {}  # TODO not filled anymore?
-        self.import_order: int = 0  # module import order
-        self.from_module: dict[ast.AST, "python.Module"] = {}
-        self.class_def_order: int = 0
-        # command-line options
-        self.wrap_around_check: bool = True
-        self.bounds_checking: bool = True
-        self.assertions: bool = True
-        self.executable_product: bool = True
-        self.pyextension_product: bool = False
-        self.int32: bool = False
-        self.int64: bool = False
-        self.int128: bool = False
-        self.float32: bool = False
-        self.float64: bool = False
-        self.flags: Optional[Path] = None
-        self.silent: bool = False
-        self.nogc: bool = False
-        self.backtrace: bool = False
-        self.makefile_name: str = "Makefile"
-        self.debug_level: int = 0
-        self.outputdir: Optional[str] = None
-        self.nomakefile: bool = False
 
-        # Others
-        self.item_rvalue: dict[ast.AST, ast.AST] = {}
-        self.genexp_to_lc: dict[ast.GeneratorExp, ast.ListComp] = {}
-        self.setcomp_to_lc: dict[ast.SetComp, ast.ListComp] = {}
-        self.dictcomp_to_lc: dict[ast.DictComp, ast.ListComp] = {}
-        self.bool_test_only: set[ast.AST] = set()
-        self.called: set[ast.Attribute] = set()
-        self.tempcount: dict[Any, str] = {}
-        self.struct_unpack: dict[
-            ast.Assign, Tuple[List[Tuple[str, str, str, int]], str, str]
-        ] = {}
-        self.augment: set[ast.AST] = set()
+        # Create immutable compiler options from namespace
+        self.compiler_options = CompilerOptions.from_namespace(options)
 
-        self.maxhits = 0  # XXX amaze.py termination
-        self.terminal = None
-        self.progressbar: Optional["ProgressBar"] = None
-        self.generate_cmakefile: bool = False
+        # Create compiler paths (discovers shedskin installation)
+        self.compiler_paths = CompilerPaths.from_installation()
 
-        # from infer.py
-        self.added_allocs: int = 0
-        self.added_allocs_set: set[Any] = set()
-        self.added_funcs: int = 0
-        self.added_funcs_set: set["python.Function"] = set()
-        self.cpa_clean: bool = False
-        self.cpa_limit: int = 0
-        self.cpa_limited: bool = False
-        self.merged_inh: dict[Any, set[Tuple[Any, int]]] = {}
+        # Create mutable compiler state
+        self.compiler_state = CompilerState()
+
+        # Initialize cpp_keywords from illegal.txt
+        self.compiler_state.cpp_keywords = self.compiler_paths.get_illegal_keywords()
+
+        # Set module_path if provided in options
+        if hasattr(options, 'module_path') and options.module_path:
+            self.compiler_paths = CompilerPaths(
+                shedskin_lib=self.compiler_paths.shedskin_lib,
+                sysdir=self.compiler_paths.sysdir,
+                libdirs=self.compiler_paths.libdirs,
+                module_path=Path(options.module_path),
+            )
 
     def get_stats(self) -> dict[str, Any]:
-        pyfile = Path(self.module_path)
+        """Get compilation statistics.
+
+        Returns:
+            Dictionary with compilation stats and configuration
+        """
+        state = self.compiler_state
+        opts = self.compiler_options
+
+        pyfile = Path(self.compiler_paths.module_path) if self.compiler_paths.module_path else Path("unknown")
+
         return {
             "name": pyfile.stem,
             "filename": str(pyfile),
@@ -148,95 +93,120 @@ class GlobalInfo:  # XXX add comments, split up
             "prebuild_secs": 0.0,
             "build_secs": 0.0,
             "run_secs": 0.0,
-            "n_constraints": len(self.constraints),
-            "n_vars": len(self.allvars),
-            "n_funcs": len(self.allfuncs),
-            "n_classes": len(self.allclasses),
-            "n_cnodes": len(self.cnode.keys()),
-            "n_types": len(self.types.keys()),
-            "n_orig_types": len(self.orig_types.keys()),
-            "n_modules": len(self.modules.keys()),
-            "n_templates": self.templates,
-            "n_inheritance_relations": len(self.inheritance_relations.keys()),
-            "n_inheritance_temp_vars": len(self.inheritance_temp_vars.keys()),
-            "n_parent_nodes": len(self.parent_nodes.keys()),
-            "n_inherited": len(self.inherited),
-            "n_assign_target": len(self.assign_target.keys()),
-            "n_alloc_info": len(self.alloc_info.keys()),
-            "n_new_alloc_info": len(self.new_alloc_info.keys()),
-            "n_iterations": self.iterations,
-            "total_iterations": self.total_iterations,
-            "n_called": len(self.called),
-            "added_allocs": self.added_allocs,
-            "added_funcs": self.added_funcs,
-            "cpa_limit": self.cpa_limit,
+            "n_constraints": len(state.constraints),
+            "n_vars": len(state.allvars),
+            "n_funcs": len(state.allfuncs),
+            "n_classes": len(state.allclasses),
+            "n_cnodes": len(state.cnode.keys()),
+            "n_types": len(state.types.keys()),
+            "n_orig_types": len(state.orig_types.keys()),
+            "n_modules": len(state.modules.keys()),
+            "n_templates": state.templates,
+            "n_inheritance_relations": len(state.inheritance_relations.keys()),
+            "n_inheritance_temp_vars": len(state.inheritance_temp_vars.keys()),
+            "n_parent_nodes": len(state.parent_nodes.keys()),
+            "n_inherited": len(state.inherited),
+            "n_assign_target": len(state.assign_target.keys()),
+            "n_alloc_info": len(state.alloc_info.keys()),
+            "n_new_alloc_info": len(state.new_alloc_info.keys()),
+            "n_iterations": state.iterations,
+            "total_iterations": state.total_iterations,
+            "n_called": len(state.called),
+            "added_allocs": state.added_allocs,
+            "added_funcs": state.added_funcs,
+            "cpa_limit": state.cpa_limit,
             # commandline-options
-            "wrap_around_check": self.wrap_around_check,
-            "bounds_checking": self.bounds_checking,
-            "assertions": self.assertions,
-            "executable_product": self.executable_product,
-            "pyextension_product": self.pyextension_product,
-            "int32": self.int32,
-            "int64": self.int64,
-            "int128": self.int128,
-            "float32": self.float32,
-            "float64": self.float64,
-            "silent": self.silent,
-            "nogc": self.nogc,
-            "backtrace": self.backtrace,
+            "wrap_around_check": opts.wrap_around_check,
+            "bounds_checking": opts.bounds_checking,
+            "assertions": opts.assertions,
+            "executable_product": opts.executable_product,
+            "pyextension_product": opts.pyextension_product,
+            "int32": opts.int32,
+            "int64": opts.int64,
+            "int128": opts.int128,
+            "float32": opts.float32,
+            "float64": opts.float64,
+            "silent": opts.silent,
+            "nogc": opts.nogc,
+            "backtrace": opts.backtrace,
         }
 
     def init_directories(self) -> None:
-        """Initialize directory paths"""
-        abspath = os.path.abspath(__file__)  # sanitize mixed fwd/bwd slashes (mingw)
-        shedskin_directory = os.sep.join(abspath.split(os.sep)[:-1])
-        for dirname in sys.path:
-            if os.path.exists(os.path.join(dirname, shedskin_directory)):
-                shedskin_directory = os.path.join(dirname, shedskin_directory)
-                break
-        shedskin_libdir = os.path.join(shedskin_directory, "lib")
-        self.shedskin_lib = Path(shedskin_libdir)
-        system_libdir = "/usr/share/shedskin/lib"
-        self.sysdir = shedskin_directory
-        # set resources subdirectors
-        self.shedskin_resources = Path(shedskin_directory) / "resources"
-        self.shedskin_cmake = self.shedskin_resources / "cmake" / "modular"
-        self.shedskin_conan = self.shedskin_resources / "conan"
-        self.shedskin_flags = self.shedskin_resources / "flags"
-        self.shedskin_illegal = self.shedskin_resources / "illegal"
+        """Initialize directory paths.
 
-        if os.path.isdir(shedskin_libdir):
-            self.libdirs = [shedskin_libdir]
-        elif os.path.isdir(system_libdir):
-            self.libdirs = [system_libdir]
+        Deprecated: This method is now handled by CompilerPaths.from_installation().
+        Kept for backward compatibility.
+        """
+        # This is now a no-op as paths are initialized in __init__
+        pass
+
+    def __getattr__(self, name: str) -> Any:
+        """Delegate attribute access to composed components for backward compatibility.
+
+        This allows existing code to access attributes like gx.constraints or
+        gx.wrap_around_check directly, even though they're now in separate
+        components.
+
+        Args:
+            name: Attribute name
+
+        Returns:
+            Value from compiler_state, compiler_options, or compiler_paths
+
+        Raises:
+            AttributeError: If attribute doesn't exist in any component
+        """
+        # Try compiler_state first (most common case)
+        if hasattr(self.compiler_state, name):
+            return getattr(self.compiler_state, name)
+
+        # Try compiler_options
+        if hasattr(self.compiler_options, name):
+            return getattr(self.compiler_options, name)
+
+        # Try compiler_paths
+        if hasattr(self.compiler_paths, name):
+            return getattr(self.compiler_paths, name)
+
+        # Not found in any component
+        raise AttributeError(
+            f"'{type(self).__name__}' object has no attribute '{name}'"
+        )
+
+    def __setattr__(self, name: str, value: Any) -> None:
+        """Delegate attribute setting to composed components for backward compatibility.
+
+        Args:
+            name: Attribute name
+            value: Value to set
+        """
+        # Allow setting the core components and options during __init__
+        if name in ('options', 'compiler_options', 'compiler_paths', 'compiler_state'):
+            object.__setattr__(self, name, value)
+            return
+
+        # Once initialized, delegate to appropriate component
+        if hasattr(self, 'compiler_state') and hasattr(self.compiler_state, name):
+            setattr(self.compiler_state, name, value)
+        elif hasattr(self, 'compiler_paths') and hasattr(self.compiler_paths, name):
+            # CompilerPaths attributes (except module_path which is mutable)
+            if name == 'module_path':
+                self.compiler_paths.module_path = value
+            else:
+                object.__setattr__(self.compiler_paths, name, value)
+        elif hasattr(self, 'compiler_options') and hasattr(self.compiler_options, name):
+            # CompilerOptions is frozen, but we need backward compatibility
+            # Work around frozen dataclass by creating a new instance with the updated value
+            from dataclasses import replace
+            new_options = replace(self.compiler_options, **{name: value})
+            object.__setattr__(self, 'compiler_options', new_options)
         else:
-            print(
-                "*ERROR* Could not find lib directory in %s or %s.\n"
-                % (shedskin_libdir, system_libdir)
-            )
-            sys.exit(1)
+            # New attribute - add to compiler_state
+            if hasattr(self, 'compiler_state'):
+                setattr(self.compiler_state, name, value)
+            else:
+                object.__setattr__(self, name, value)
 
 
-# utility functions
-
-
-def get_pkg_path() -> Path:
-    """Return the path to the shedskin package"""
-    _pkg_path = Path(__file__).parent
-    assert _pkg_path.name == "shedskin"
-    return _pkg_path
-
-
-def get_user_cache_dir() -> Path:
-    """Get user cache directory depending on platform"""
-    if PLATFORM == "Darwin":
-        return Path("~/Library/Caches/shedskin").expanduser()
-    if PLATFORM == "Linux":
-        return Path("~/.cache/shedskin").expanduser()
-    if PLATFORM == "Windows":
-        profile = os.getenv("USERPROFILE")
-        if not profile:
-            raise SystemExit("USERPROFILE environment variable not set on windows")
-        user_dir = Path(profile)
-        return user_dir / "AppData" / "Local" / "shedskin" / "Cache"
-    raise SystemExit(f"{PLATFORM} os not supported")
+# Exports
+__all__ = ['GlobalInfo', 'get_pkg_path', 'get_user_cache_dir', 'PLATFORM']
