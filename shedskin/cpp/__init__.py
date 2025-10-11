@@ -12,5 +12,8 @@ from .namer import CPPNamer
 from .output import OutputMixin
 from .expressions import ExpressionVisitorMixin
 from .statements import StatementVisitorMixin
+from .helpers import HelperMixin
+from .declarations import DeclarationMixin
+from .templates import TemplateMixin
 
-__all__ = ['CPPNamer', 'OutputMixin', 'ExpressionVisitorMixin', 'StatementVisitorMixin']
+__all__ = ['CPPNamer', 'OutputMixin', 'ExpressionVisitorMixin', 'StatementVisitorMixin', 'HelperMixin', 'DeclarationMixin', 'TemplateMixin']

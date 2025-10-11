@@ -453,8 +453,23 @@ __all__ = ['CPPNamer', 'GenerateVisitor', 'generate_code']
   - Reduced cpp.py from 2,959 to 2,326 lines (633 lines extracted)
   - All 114 unit tests pass
   - Basic and complex compilation tests pass
+  - Committed: 74c304d6
+- [x] **Phase 5**: Extract Remaining Modules (1 day) ✅ COMPLETE
+  - Created cpp/helpers.py with HelperMixin (426 lines)
+    - Extracted 18 helper methods (404 lines): do_* methods and optimization helpers
+    - Methods include: do_main, do_init_modules, do_fastfor, do_compare, fastfor, fastenumerate, etc.
+  - Created cpp/declarations.py with DeclarationMixin (875 lines)
+    - Extracted 27 declaration methods (851 lines): header/implementation generation
+    - Methods include: module_hpp, class_hpp, func_header, generator_class, listcomp methods, etc.
+  - Created cpp/templates.py with TemplateMixin (153 lines)
+    - Extracted 9 type/template methods (131 lines): type checking and casting
+    - Methods include: nothing, inhcpa, subtypes, cast_to_builtin, only_classes, etc.
+  - GenerateVisitor now inherits from all mixins: TemplateMixin, DeclarationMixin, HelperMixin, StatementVisitorMixin, ExpressionVisitorMixin, OutputMixin
+  - Reduced cpp.py from 2,326 to 946 lines (1,386 lines extracted in Phase 5)
+  - Total extracted across all phases: 3,449 lines (79% reduction from original 4,389 lines)
+  - All 114 unit tests pass
+  - Basic compilation tests pass
   - Committed: [commit hash]
-- [ ] **Phase 5**: Extract Remaining Modules (1 day)
 - [ ] **Phase 6**: Final Integration (4 hours)
 
 ### Post-Migration
@@ -526,4 +541,4 @@ If issues arise during migration:
 
 **Author**: Claude (with human oversight)
 **Last Updated**: 2025-10-11
-**Status**: 🚀 In Progress - Phase 4 Complete (67% done)
+**Status**: 🚀 In Progress - Phase 5 Complete (83% done - major refactoring complete!)
