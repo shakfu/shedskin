@@ -677,32 +677,50 @@ class CMakeBuilder:
 
     def cmake_config(self, options: list[str], generator: Optional[str] = None) -> None:
         """CMake configuration phase"""
-        opts = " ".join(options)
-        cfg_cmd = f"cmake {opts} -S {self.source_dir} -B {self.build_dir}"
+        # Build command as list for security
+        cfg_cmd = ["cmake"] + options + ["-S", str(self.source_dir), "-B", str(self.build_dir)]
         if generator:
-            cfg_cmd += ' -G "{generator}"'
-        self.log.info(cfg_cmd)
-        assert_command_success(cfg_cmd, shell=True)
+            cfg_cmd.extend(["-G", generator])
+
+        # Log the command
+        cmd_str = " ".join(str(c) for c in cfg_cmd)
+        self.log.info(cmd_str)
+
+        # Execute without shell=True for security
+        from .subprocess_utils import run_command
+        run_command(cfg_cmd, shell=False, check=True)
 
     def cmake_build(self, options: list[str]) -> None:
         """Activate cmake build"""
-        opts = " ".join(options)
-        bld_cmd = f"cmake --build {self.build_dir} {opts}"
-        self.log.info(bld_cmd)
-        print("bld_cmd:", bld_cmd)
-        assert_command_success(bld_cmd, shell=True)
+        # Build command as list for security
+        bld_cmd = ["cmake", "--build", str(self.build_dir)] + options
+
+        # Log the command
+        cmd_str = " ".join(str(c) for c in bld_cmd)
+        self.log.info(cmd_str)
+        print("bld_cmd:", cmd_str)
+
+        # Execute without shell=True for security
+        from .subprocess_utils import run_command
+        run_command(bld_cmd, shell=False, check=True)
 
     def cmake_test(self, options: list[str]) -> None:
         """Activate ctest"""
-        opts = " ".join(options)
-        if platform.system() == "Windows":
-            cfg = f"-C {self.options.build_type}"
-        else:
-            cfg = ""
+        # Build command as list for security
+        tst_cmd = ["ctest"]
 
-        tst_cmd = f"ctest {cfg} --output-on-failure {opts} --test-dir {self.build_dir}"
-        self.log.info(tst_cmd)
-        assert_command_success(tst_cmd, shell=True)
+        if platform.system() == "Windows":
+            tst_cmd.extend(["-C", self.options.build_type])
+
+        tst_cmd.extend(["--output-on-failure"] + options + ["--test-dir", str(self.build_dir)])
+
+        # Log the command
+        cmd_str = " ".join(str(c) for c in tst_cmd)
+        self.log.info(cmd_str)
+
+        # Execute without shell=True for security
+        from .subprocess_utils import run_command
+        run_command(tst_cmd, shell=False, check=True)
 
     def run_tests(self) -> None:
         """Run tests as a test runner"""
@@ -749,11 +767,11 @@ class CMakeBuilder:
             cfg_options.append(f"-G{self.options.generator}")
 
         if self.options.build_type:
-            cfg_options.append(f" -DCMAKE_BUILD_TYPE={self.options.build_type}")
+            cfg_options.append(f"-DCMAKE_BUILD_TYPE={self.options.build_type}")
 
         if self.options.jobs:
-            bld_options.append(f"--parallel {self.options.jobs}")
-            tst_options.append(f"--parallel {self.options.jobs}")
+            bld_options.extend(["--parallel", str(self.options.jobs)])
+            tst_options.extend(["--parallel", str(self.options.jobs)])
 
         if self.options.ccache:
             if shutil.which("ccache"):
@@ -795,15 +813,15 @@ class CMakeBuilder:
         if self.options.target:
             target_suffix = "-exe"
             for target in self.options.target:
-                bld_options.append(f"--target {target}{target_suffix}")
-                tst_options.append(f"--tests-regex {target}{target_suffix}")
+                bld_options.extend(["--target", f"{target}{target_suffix}"])
+                tst_options.extend(["--tests-regex", f"{target}{target_suffix}"])
 
         # -------------------------------------------------------------------------
         # test options
 
         if run_tests:
             if self.options.include:
-                tst_options.append(f"--tests-regex {self.options.include}")
+                tst_options.extend(["--tests-regex", self.options.include])
 
             if self.options.check:
                 self.check(self.options.name)  # check python syntax
@@ -812,8 +830,8 @@ class CMakeBuilder:
                 test = self.get_most_recent_test()
                 assert test, "test required"
                 most_recent_test = pathlib.Path(test).stem
-                bld_options.append(f"--target {most_recent_test}")
-                tst_options.append(f"--tests-regex {most_recent_test}")
+                bld_options.extend(["--target", most_recent_test])
+                tst_options.extend(["--tests-regex", most_recent_test])
 
             # nocleanup
 
@@ -824,8 +842,8 @@ class CMakeBuilder:
                 target_suffix = "-exe"
                 if self.options.extmod:
                     target_suffix = "-ext"
-                bld_options.append(f"--target {self.options.run}{target_suffix}")
-                tst_options.append(f"--tests-regex {self.options.run}")
+                bld_options.extend(["--target", f"{self.options.run}{target_suffix}"])
+                tst_options.extend(["--tests-regex", self.options.run])
 
             if self.options.stoponfail:
                 tst_options.append("--stop-on-failure")

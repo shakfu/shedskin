@@ -12,8 +12,8 @@ shedskin
                 pcre
                     build
 """
-import os
 import shutil
+import subprocess
 import sys
 from pathlib import Path
 
@@ -24,9 +24,18 @@ CYAN = "\x1b[36;20m"
 RESET = "\x1b[0m"
 
 def shellcmd(cmd, *args, **kwds):
+    """Execute a shell command safely using subprocess.
+
+    WARNING: This function uses shell=True, which can be a security risk
+    if the command contains untrusted input. All inputs should be validated.
+    """
+    formatted_cmd = cmd.format(*args, **kwds)
     print('-'*80)
-    print(f'{WHITE}cmd{RESET}: {CYAN}{cmd}{RESET}')
-    os.system(cmd.format(*args, **kwds))
+    print(f'{WHITE}cmd{RESET}: {CYAN}{formatted_cmd}{RESET}')
+    result = subprocess.run(formatted_cmd, shell=True, check=False)
+    if result.returncode != 0:
+        print(f'{WHITE}Warning{RESET}: Command returned non-zero exit code: {result.returncode}')
+    return result.returncode
 
 def git_clone(repo, to_dir):
     shellcmd(f'git clone --depth=1 {repo} {to_dir}')

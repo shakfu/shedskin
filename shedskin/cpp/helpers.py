@@ -9,6 +9,7 @@ This module contains helper methods including:
 """
 
 import ast
+import textwrap
 from typing import TYPE_CHECKING, Any, List, Optional, Tuple, TypeAlias, Union
 
 from .. import ast_utils, python, typestr
