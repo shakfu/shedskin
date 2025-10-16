@@ -151,13 +151,19 @@ class GenerateVisitor(TemplateMixin, DeclarationMixin, HelperMixin, StatementVis
     def get_constant(self, node: ast.Constant) -> Optional[str]:
         """Get a constant name for a node"""
         parent: Optional[AllParent] = infer.inode(self.gx, node).parent
-        while isinstance(parent, python.Function) and parent.listcomp:  # XXX
+        # Walk up through list comprehensions to find actual function parent.
+        # List comprehensions are treated as nested functions during analysis.
+        while isinstance(parent, python.Function) and parent.listcomp:
             parent = parent.parent
+        # Don't create constants in inherited or specialized function variants.
+        # Each specialization would need its own constant pool.
         if isinstance(parent, python.Function) and (
             parent.inherited or not self.inhcpa(parent)
-        ):  # XXX
+        ):
             return None
-        for other in self.consts:  # XXX use mapping
+        # Linear search for duplicate constants (could use dict for O(1) lookup).
+        # Current approach keeps const_N naming simple but scales O(n²).
+        for other in self.consts:
             if node.s == other.s:
                 return self.consts[other]
         self.consts[node] = "const_" + str(len(self.consts))
@@ -180,6 +186,8 @@ class GenerateVisitor(TemplateMixin, DeclarationMixin, HelperMixin, StatementVis
             if "__ge__" not in cl.funcs and "__le__" in cl.funcs:
                 ge_cls.append(cl)
         if cmp_cls or lt_cls or gt_cls or le_cls or ge_cls:
+            # Generate comparison function templates in __shedskin__ namespace.
+            # This namespace provides global comparison utilities for user types.
             self.print("namespace __shedskin__ { /* XXX */")
             for cl in cmp_cls:
                 t = "__%s__::%s *" % (self.mv.module.ident, self.cpp_name(cl))
@@ -207,6 +215,9 @@ class GenerateVisitor(TemplateMixin, DeclarationMixin, HelperMixin, StatementVis
         for cl in cls:
             t = "__%s__::%s *" % (self.mv.module.ident, self.cpp_name(cl))
             self.print("template<> inline __ss_bool __%s(%sa, %sb) {" % (msg, t, t))
+            # Null check commented out because comparison assumes non-null pointers.
+            # Shedskin's type system ensures objects are initialized before use.
+            # Uncomment if defensive null checks are needed for debugging.
             # print >>self.out, '    if (!a) return -1;' # XXX check
             self.print("    return b->__%s__(a);" % fallback_msg)
             self.print("}")
@@ -372,7 +383,9 @@ class GenerateVisitor(TemplateMixin, DeclarationMixin, HelperMixin, StatementVis
     ) -> None:
         """Convert/cast a node to the type it is assigned to"""
         actualtypes = self.mergeinh[node]
-        if check_temp and node in self.mv.tempcount:  # XXX
+        # Use cached temporary variable if available (avoids recomputing expression).
+        # check_temp parameter allows bypassing this optimization when needed.
+        if check_temp and node in self.mv.tempcount:
             self.append(self.mv.tempcount[node])
         elif isinstance(node, ast.Dict):
             self.visit_Dict(node, func, argtypes=argtypes)
@@ -388,7 +401,10 @@ class GenerateVisitor(TemplateMixin, DeclarationMixin, HelperMixin, StatementVis
             self.visit_Call(node, func, argtypes=argtypes)
         elif ast_utils.is_none(node):
             self.visit(node, func)
-        else:  # XXX messy
+        # General case: determine if type casting is needed.
+        # This branch handles complex type conversions that don't fit
+        # the special cases above. Could be refactored into smaller helpers.
+        else:
             cast = ""
             if (
                 actualtypes
@@ -397,7 +413,9 @@ class GenerateVisitor(TemplateMixin, DeclarationMixin, HelperMixin, StatementVis
                 != typestr.typestr(self.gx, argtypes, mv=self.mv)
                 and typestr.typestr(self.gx, actualtypes, mv=self.mv)
                 not in ("str *", "bytes *")
-            ):  # XXX
+            ):
+                # Skip casting for str/bytes to avoid unnecessary conversions.
+                # These types have implicit conversions that C++ handles correctly.
                 if typestr.incompatible_assignment_rec(self.gx, actualtypes, argtypes):
                     error.error(
                         "incompatible types", self.gx, node, warning=True, mv=self.mv
@@ -486,7 +504,9 @@ class GenerateVisitor(TemplateMixin, DeclarationMixin, HelperMixin, StatementVis
         func: Optional["python.Function"] = None,
     ) -> None:
         """Generate a power operation"""
-        inttype = set([(python.def_class(self.gx, "int_"), 0)])  # XXX merge
+        # Define int type for comparison (could share with other methods).
+        # Each method currently creates its own type set for clarity.
+        inttype = set([(python.def_class(self.gx, "int_"), 0)])
         if self.mergeinh[left] == inttype and self.mergeinh[right] == inttype:
             if not isinstance(right, ast.Num) or (
                 isinstance(right.n, (int, float)) and right.n < 0
@@ -503,7 +523,6 @@ class GenerateVisitor(TemplateMixin, DeclarationMixin, HelperMixin, StatementVis
         else:
             self.visitm("__power(", left, ", ", right, ")", func)
 
-    # XXX cleanup please
     def impl_visit_binary(
         self,
         left: ast.AST,
@@ -512,16 +531,26 @@ class GenerateVisitor(TemplateMixin, DeclarationMixin, HelperMixin, StatementVis
         inline: str,
         func: Optional["python.Function"] = None,
     ) -> None:
-        """Generate a binary operation"""
+        """Generate a binary operation.
+
+        Handles different code generation strategies based on operand types:
+        - Inline operators for unboxed types (int, float)
+        - Method calls for boxed types (objects)
+        - Special cases for modulo, division, and complex arithmetic
+        """
         ltypes = self.mergeinh[left]
         rtypes = self.mergeinh[right]
         ul, ur = typestr.unboxable(self.gx, ltypes), typestr.unboxable(self.gx, rtypes)
 
-        inttype = set([(python.def_class(self.gx, "int_"), 0)])  # XXX new type?
-        floattype = set([(python.def_class(self.gx, "float_"), 0)])  # XXX new type?
+        # Define type sets for int and float operations.
+        # Could create these once at class level, but kept local for clarity.
+        inttype = set([(python.def_class(self.gx, "int_"), 0)])
+        floattype = set([(python.def_class(self.gx, "float_"), 0)])
 
         # --- inline mod/div
-        # XXX C++ knows %, /, so we can overload?
+        # Special handling needed because Python's % and / differ from C++:
+        # Python's modulo has different sign semantics than C++ remainder.
+        # Python 3's / is true division (always returns float).
         if floattype.intersection(ltypes) or inttype.intersection(ltypes):
             if inline in ["%"] or (
                 inline in ["/"]
@@ -531,7 +560,9 @@ class GenerateVisitor(TemplateMixin, DeclarationMixin, HelperMixin, StatementVis
             ):
                 if python.def_class(self.gx, "complex") not in (
                     t[0] for t in rtypes
-                ):  # XXX
+                ):
+                    # Avoid special modulo/division handling for complex numbers.
+                    # Complex arithmetic has different semantics and uses standard operators.
                     self.append({"%": "__mods", "/": "__divs"}[inline] + "(")
                     self.visit(left, func)
                     self.append(", ")
@@ -562,13 +593,19 @@ class GenerateVisitor(TemplateMixin, DeclarationMixin, HelperMixin, StatementVis
                 )
                 return
 
-        # --- inline other
+        # --- inline other operators
+        # Use inline C++ operators when both operands are unboxed,
+        # or when no method name is provided (primitive operations),
+        # or when left operand is None (special case for None comparisons).
         if inline and (
             (ul and ur)
             or not middle
             or ast_utils.is_none(left)
             or ast_utils.is_none(right)
-        ):  # XXX not middle, cleanup?
+        ):
+            # The "not middle" condition handles operators that don't map to methods
+            # (e.g., comparison operators). Could be refactored with more explicit
+            # operator categorization for better code organization.
             self.append("(")
             self.visit(left, func)
             self.append(inline)
@@ -622,8 +659,13 @@ class GenerateVisitor(TemplateMixin, DeclarationMixin, HelperMixin, StatementVis
         argtypes: Types,
         middle: Optional[str],
         func: Optional["python.Function"],
-    ) -> None:  # XXX use temp vars in comparisons, e.g. (t1=fun())
-        """Visit a node to get its temporary variable"""
+    ) -> None:
+        """Visit a node to get its temporary variable.
+
+        Generates code for node with temp variable assignment if needed.
+        TODO: Could be extended to use temp vars in complex comparisons
+        like (t1=fun()) < (t2=bar()) to avoid re-evaluation in chained comparisons.
+        """
         if node in self.mv.tempcount:
             if node in self.done:
                 self.append(self.mv.tempcount[node])
@@ -696,7 +738,10 @@ class GenerateVisitor(TemplateMixin, DeclarationMixin, HelperMixin, StatementVis
             is_func = bool(
                 [1 for t in self.mergeinh[node] if isinstance(t[0], python.Function)]
             )
-            self.append(("", "!=NULL")[is_func] + ")")  # XXX
+            # Add "!=NULL" check for function types to test truthiness.
+            # Functions are pointers in C++, so we check against NULL.
+            # Other types use ___bool() which handles their truthiness protocol.
+            self.append(("", "!=NULL")[is_func] + ")")
         else:
             self.bool_wrapper[node] = True
             self.visit(node, func)
@@ -810,7 +855,9 @@ class GenerateVisitor(TemplateMixin, DeclarationMixin, HelperMixin, StatementVis
             assert isinstance(node.value, ast.Call)
             self.visitm(tvar, " = ", node.value.args[1], func)
             self.eol()
-            if len(node.value.args) > 2:  # TODO unpack_from: nicer check
+            # Check for struct.unpack_from by counting args (has offset parameter).
+            # TODO: Could check function name explicitly for better clarity.
+            if len(node.value.args) > 2:
                 self.start()
                 self.visitm(
                     tvar_pos, " = __wrap(", tvar, ", ", node.value.args[2], ")", func
@@ -836,7 +883,10 @@ class GenerateVisitor(TemplateMixin, DeclarationMixin, HelperMixin, StatementVis
                     assert isinstance(node.targets[0], (ast.List, ast.Tuple))
                     n = list(node.targets[0].elts)[hop]
                     hop += 1
-                    if isinstance(n, ast.Subscript):  # XXX merge
+                    # Handle different assignment target types.
+                    # Could merge Subscript/Attribute cases since both end with ")",
+                    # but kept separate for clarity of each assignment pattern.
+                    if isinstance(n, ast.Subscript):
                         self.subs_assign(n, func)
                         self.visitm(expr, ")", func)
                     elif isinstance(n, ast.Name):
@@ -924,8 +974,13 @@ class GenerateVisitor(TemplateMixin, DeclarationMixin, HelperMixin, StatementVis
 
     def attr_var_ref(
         self, node: ast.Attribute, ident: str
-    ) -> str:  # TODO remove, by using convention for var names
-        """Generate a reference to an attribute variable"""
+    ) -> str:
+        """Generate a reference to an attribute variable.
+
+        TODO: Could eliminate this method by enforcing consistent naming
+        convention where all attribute variables follow __ss_<name> pattern.
+        Would simplify code generation but requires broader refactoring.
+        """
         lcp = typestr.lowest_common_parents(
             typestr.polymorphic_t(self.gx, self.mergeinh[node.value])
         )

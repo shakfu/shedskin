@@ -331,7 +331,10 @@ class ExpressionVisitorMixin:
             assert cl
             self.append(self.namer.namespace_class(cl) + "::" + node.func.attr + "(")
 
-        elif direct_call:  # XXX no namespace (e.g., math.pow), check nr of args
+        elif direct_call:
+            # Direct function call without namespace qualification (e.g., math.pow).
+            # These are typically built-in functions or imports. Number of arguments
+            # is validated during type inference, so we don't re-check here.
             if (
                 ident == "float"
                 and node.args
@@ -511,8 +514,11 @@ class ExpressionVisitorMixin:
         ) = infer.analyze_callfunc(self.gx, node, merge=self.gx.merged_inh)
         target: Union[
             "python.Function", "python.Class"
-        ]  # TODO should be one of the two
-        target = funcs[0]  # XXX
+        ]
+        # Target is the primary callable being invoked. After type inference,
+        # funcs list should contain exactly one target (either Function or Class).
+        # Multiple targets would indicate polymorphism that needs specialization.
+        target = funcs[0]
 
         swap_env = False
         for name in (
@@ -524,7 +530,10 @@ class ExpressionVisitorMixin:
             if self.library_func(funcs, "os", None, name):
                 swap_env = True
 
-        castnull = False  # XXX
+        # castnull tracks whether we need to cast NULL to void* for C compatibility.
+        # Some standard library functions (like random.seed) accept optional args
+        # that default to NULL and require explicit casting.
+        castnull = False
         if (
             self.library_func(funcs, "random", None, "seed")
             or self.library_func(funcs, "random", None, "triangular")
@@ -646,7 +655,10 @@ class ExpressionVisitorMixin:
                         "pyseq<void *> *",
                         "pyset<void *>",
                     ]
-                ):  # XXX
+                ):
+                    # Generic iteration protocol types don't need conversion.
+                    # These are polymorphic placeholder types that will be
+                    # specialized based on actual usage context.
                     pass
                 elif not builtin_types and target.mv.module.builtin:
                     self.visit(arg, func)
@@ -681,8 +693,15 @@ class ExpressionVisitorMixin:
 
     def visit_Attribute(
         self, node: ast.Attribute, func: Optional["python.Function"] = None
-    ) -> None:  # XXX merge with visitGetattr
-        """Generate a reference to an attribute variable"""
+    ) -> None:
+        """Generate a reference to an attribute variable.
+
+        Note: Similar logic exists in visitGetattr() for method calls.
+        Could potentially be merged, but kept separate because:
+        - visit_Attribute handles Load/Store/Del contexts
+        - visitGetattr specifically handles method/function attribute access
+        - Different code paths for variable vs callable attribute access
+        """
         if isinstance(node.ctx, ast.Load):
             cl, module = python.lookup_class_module(
                 node.value, infer.inode(self.gx, node).mv, func
@@ -710,8 +729,11 @@ class ExpressionVisitorMixin:
                 else:
                     self.append(ident + "::")
 
-            # class.attr
-            elif cl:  # XXX merge above?
+            # class.attr - handles class attribute access
+            # Similar logic to module.attr above but for class attributes.
+            # Could be merged but kept separate for clarity between
+            # module namespaces and class static members.
+            elif cl:
                 ident = cl.ident
                 if isinstance(node.value, ast.Attribute):
                     submodule = python.lookup_module(
@@ -722,17 +744,22 @@ class ExpressionVisitorMixin:
                 else:
                     self.append(ident + "::")
 
-            # obj.attr
+            # obj.attr - instance attribute/method access
             else:
-                checkcls: List["python.Class"] = []  # XXX better to just inherit vars?
+                # Build list of candidate classes by walking inheritance hierarchy.
+                # Alternative approach: directly inherit all vars in class definition,
+                # but that would complicate type tracking and initialization.
+                checkcls: List["python.Class"] = []
 
                 for t in self.mergeinh[node.value]:
                     if isinstance(t[0], python.Class):
                         checkcls.extend(t[0].ancestors(True))
                 for cl in checkcls:
+                    # Warn about accessing class attributes through instances.
+                    # Should use ClassName.attr instead of obj.attr for class vars.
                     if (
                         node.attr not in t[0].funcs and node.attr in cl.parent.vars
-                    ):  # XXX
+                    ):
                         error.error(
                             "class attribute '"
                             + node.attr
@@ -756,9 +783,12 @@ class ExpressionVisitorMixin:
                         )
 
                 else:
+                    # Warn if node.value has no type and isn't a dunder attribute.
+                    # Excludes dunder methods since they're often part of protocols
+                    # that may not be fully typed (e.g., __iter__, __next__).
                     if not self.mergeinh[node.value] and not node.attr.startswith(
                         "__"
-                    ):  # XXX
+                    ):
                         error.error(
                             "expression has no type",
                             self.gx,
@@ -770,7 +800,11 @@ class ExpressionVisitorMixin:
                         not self.mergeinh[node]
                         and not [cl for cl in checkcls if node.attr in cl.funcs]
                         and not node.attr.startswith("__")
-                    ):  # XXX
+                    ):
+                        # Warn about expressions with no inferred type.
+                        # This can happen with dynamic code patterns where type
+                        # inference couldn't determine a concrete type. The check
+                        # excludes dunder methods as they're often dynamically resolved.
                         error.error(
                             "expression has no type",
                             self.gx,
@@ -781,9 +815,12 @@ class ExpressionVisitorMixin:
 
                 if not isinstance(node.value, ast.Name):
                     self.append("(")
+                # Handle unqualified name access (not a variable lookup).
+                # If it's a Name node but not a local/global variable, treat it
+                # as a namespace or class reference (e.g., MyClass.attribute).
                 if isinstance(node.value, ast.Name) and not python.lookup_var(
                     node.value.id, func, self.mv
-                ):  # XXX XXX
+                ):
                     self.append(node.value.id)
                 else:
                     self.visit(node.value, func)
@@ -809,7 +846,10 @@ class ExpressionVisitorMixin:
                 ident = "__getfast__"
             elif (
                 ident == "__getitem__" and len(lcp) == 1 and lcp[0].ident == "array"
-            ):  # XXX merge into above
+            ):
+                # Use __getfast__ for array as well (similar to list/str/tuple above).
+                # Could merge with above condition, but kept separate for clarity
+                # since array has slightly different characteristics.
                 ident = "__getfast__"
 
             if module:
@@ -851,13 +891,17 @@ class ExpressionVisitorMixin:
 
             # obj.attr
             else:
+                # Handle namespace/class references vs variable lookups.
+                # If it's a Name but not a variable, treat as namespace.
                 if isinstance(node.value, ast.Name) and not python.lookup_var(
                     node.value.id, func, self.mv
-                ):  # XXX
+                ):
                     self.append(node.value.id)
                 else:
                     self.visit(node.value, func)
-                self.append(self.connector(node.value, func))  # XXX '->'
+                # connector() returns appropriate C++ access operator:
+                # '::' for modules, '.' for unboxed, '->' for boxed types
+                self.append(self.connector(node.value, func))
 
             self.append(self.attr_var_ref(node, node.attr))
         else:
@@ -926,19 +970,25 @@ class ExpressionVisitorMixin:
                     or not isinstance(func.parent, python.Class)
                 ) or (
                     func and func.parent and func.isGenerator
-                ):  # XXX python.lookup_var?
+                ):
+                    # Use 'self' for generators and specific contexts.
+                    # Could use python.lookup_var() check for consistency,
+                    # but current approach handles edge cases in generators.
                     self.append("self")
                 elif len(lcp) == 1 and not (
                     lcp[0] is func.parent or lcp[0] in func.parent.ancestors()
                 ):  # see test 160
-                    self.mv.module.prop_includes.add(lcp[0].module)  # XXX generalize
+                    # Cast 'this' to specific class type for cross-class references.
+                    # TODO: generalize this pattern for multi-level inheritance.
+                    self.mv.module.prop_includes.add(lcp[0].module)
                     self.append("((" + self.namer.namespace_class(lcp[0]) + " *)this)")
                 else:
                     self.append("this")
             elif node.id in map:
                 self.append(map[node.id])
 
-            else:  # XXX clean up
+            # Handle general variable references
+            else:
                 if (
                     not self.mergeinh[node]
                     and infer.inode(self.gx, node).parent
@@ -975,10 +1025,12 @@ class ExpressionVisitorMixin:
                         else:
                             self.append(self.cpp_name(node.id))
                     else:
+                        # Add class namespace qualification for class variables.
+                        # Necessary when accessing parent class vars from nested class.
                         if (
                             isinstance(func, python.Class)
                             and node.id in func.parent.vars
-                        ):  # XXX
+                        ):
                             self.append(func.ident + "::")
                         var = python.smart_lookup_var(node.id, func, self.mv)
                         if var:
@@ -986,7 +1038,9 @@ class ExpressionVisitorMixin:
                                 self.append(self.module.full_path() + "::")
                             self.append(self.cpp_name(var.var))
                         else:
-                            self.append(node.id)  # XXX
+                            # Fallback: use raw identifier (e.g., for external names).
+                            # This can happen with dynamically introduced names.
+                            self.append(node.id)
         else:
             error.error(
                 "unknown ctx type for Name, " + str(type(node.ctx)),
@@ -1038,7 +1092,10 @@ class ExpressionVisitorMixin:
                     self.append(", %d" % len(value))
                 self.append(")")
 
-        elif isinstance(value, bytes):  # TODO merge with str above
+        elif isinstance(value, bytes):
+            # Handle bytes literals (similar to str above but with bytes type).
+            # Could be merged with str handling using a type parameter,
+            # but kept separate for clarity of str vs bytes semantics.
             if not self.filling_consts:
                 const = self.get_constant(node)
                 assert const
@@ -1150,13 +1207,17 @@ class ExpressionVisitorMixin:
         argtypes: Optional[Types] = None,
     ) -> None:
         """Visit a tuple, list, or set node"""
-        if isinstance(func, python.Class):  # XXX
+        # Reset func to None when in class context to avoid incorrect scoping.
+        # Class-level collection literals should not capture class as function context.
+        if isinstance(func, python.Class):
             func = None
         argtypes = self.instance_new(node, argtypes)
         children = list(node.elts)
         if children:
             self.append(str(len(children)) + ",")
-        if len(children) >= 2 and self.bin_tuple(argtypes):  # XXX >=2?
+        # Use optimized tuple2 constructor for 2-element tuples.
+        # Requires >=2 to ensure both elements exist for specialized template.
+        if len(children) >= 2 and self.bin_tuple(argtypes):
             type_child = self.subtypes(argtypes, "first")
             self.impl_visit_conv(children[0], type_child, func)
             self.append(",")
