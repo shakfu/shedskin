@@ -197,8 +197,9 @@ template<class T> __ss_bool tuple2<T, T>::__contains__(T a) {
 }
 
 template<class T> __ss_bool tuple2<T, T>::__eq__(pyobj *p) {
-    tuple2<T,T> *b;
-    b = (tuple2<T,T> *)p;
+    tuple2<T,T> *b = dynamic_cast<tuple2<T,T> *>(p);
+    if (!b) return False;
+
     size_t sz = this->units.size();
     if(b->units.size() != sz)
         return False;
@@ -289,13 +290,15 @@ template<class A, class B> __ss_int tuple2<A, B>::__len__() {
 }
 
 template<class A, class B> __ss_bool tuple2<A, B>::__eq__(pyobj *p) {
-    tuple2<A,B> *b = (tuple2<A,B> *)p;
+    tuple2<A,B> *b = dynamic_cast<tuple2<A,B> *>(p);
+    if (!b) return False;
     return __mbool(__eq(first, b->__getfirst__()) & __eq(second, b->__getsecond__()));
 }
 
 template<class A, class B> __ss_int tuple2<A, B>::__cmp__(pyobj *p) {
     if (!p) return 1;
-    tuple2<A,B> *b = (tuple2<A,B> *)p;
+    tuple2<A,B> *b = dynamic_cast<tuple2<A,B> *>(p);
+    if (!b) return 1;  // Treat failed cast same as nullptr
     if(int c = __cmp(first, b->first)) return c;
     return __cmp(second, b->second);
 }

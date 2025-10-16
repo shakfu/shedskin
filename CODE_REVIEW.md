@@ -845,10 +845,11 @@ s = "".join(str(x) for x in items)
    - ✅ Added top-level exception handling
    - Actual effort: 3 hours
 
-4. **Fix C-style Casts** (Type Safety)
-   - Replace C-style casts with `static_cast`/`dynamic_cast`
-   - Add `nullptr` checks after `dynamic_cast`
-   - Estimated effort: 4-6 hours
+4. ~~**Fix C-style Casts** (Type Safety)~~ ✅ **COMPLETED** (2025-10-16)
+   - ✅ Replaced 5 C-style casts with `dynamic_cast`/`static_cast`
+   - ✅ Added 4 nullptr checks after `dynamic_cast`
+   - ✅ Fixed in set.hpp, tuple.hpp, exception.hpp
+   - Actual effort: 2 hours
 
 ### 9.2 Short-term Improvements (Medium Priority)
 
@@ -958,7 +959,7 @@ Shedskin demonstrates strong compiler engineering with mature algorithms. The re
 **Phase 1** (1-2 weeks): Security & Critical Fixes
 - ✅ Fix command injection (COMPLETED - 2025-10-16)
 - ✅ Improve error handling (COMPLETED - 2025-10-16)
-- Fix type safety issues
+- ✅ Fix type safety issues (C-style casts) (COMPLETED - 2025-10-16)
 
 **Phase 2** (1 month): Architecture Improvements
 - ✅ Split cpp.py into focused modules (COMPLETED - see CPP_MODULE_REFACTOR.md)
@@ -1011,6 +1012,7 @@ With these improvements, Shedskin could become significantly more maintainable w
   - Missing ast_utils import fixes (2025-10-16)
   - Command injection vulnerability fix (2025-10-16)
   - Error handling improvements (2025-10-16)
+  - C-style cast safety improvements (2025-10-16)
 
 ---
 

@@ -31,7 +31,7 @@ static void print_traceback(FILE *out)
 
     // allocate string which will be filled with the demangled function name
     size_t funcnamesize = 256;
-    char* funcname = (char*)malloc(funcnamesize);
+    char* funcname = static_cast<char*>(malloc(funcnamesize));
 
     // iterate over the returned symbol lines. skip the first, it is the
     // address of this function.

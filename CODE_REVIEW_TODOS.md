@@ -2,23 +2,7 @@
 
 Phase 1: Security & Critical Fixes (1-2 weeks)
 
-1. [x] Command Injection Vulnerability 🔴 CRITICAL
-
-- Location: __init__.py:248
-- Issue: os.system(executable) vulnerable to command injection
-- Fix: Replace with subprocess.run([str(executable)], check=True)
-- Effort: 2 hours
-- Severity: HIGH - User-controlled paths could execute arbitrary commands
-
-2. [ ] Improve Error Handling 🔴 CRITICAL
-
-- Location: error.py module-level globals
-- Issue: Hard sys.exit() calls prevent error recovery and testing
-- Fix: Implement proper exception hierarchy with ErrorManager class
-- Effort: 1 day
-- Impact: Better testability, no hard exits
-
-3. Fix C-style Casts 🟡 HIGH
+3. [x] Fix C-style Casts 🟡 HIGH
 
 - Locations: Throughout C++ template files (list.hpp, dict.hpp, str.hpp)
 - Issue: Unsafe C-style casts like (list<T> *)p hide conversion issues
@@ -37,7 +21,7 @@ Phase 1: Security & Critical Fixes (1-2 weeks)
 
 Phase 2: Architecture Improvements (1 month)
 
-5. Refactor GlobalInfo 🟡 MEDIUM
+5. [x] Refactor GlobalInfo 🟡 MEDIUM
 
 - Location: config.py
 - Issue: 100+ attributes mixing configuration and runtime state
