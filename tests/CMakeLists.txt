@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.18.4)
 
-project(shedskin_products LANGUAGES CXX)
+project(test_builtin_sorted_project LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -9,13 +9,33 @@ set(CMAKE_CXX_STANDARD 17)
 
 option(DEBUG "Enable debug output" OFF)
 
+option(SIMPLE_PROJECT "Project has a single target and no subprojects" OFF)
+
 option(BUILD_EXECUTABLE "Build executable" ON)
 option(BUILD_EXTENSION "Build python extension" OFF)
 option(BUILD_TEST "Build test" ON)
-
+option(DISABLE_EXECUTABLES "Disable building executables" OFF)
+option(DISABLE_EXTENSIONS "Disable building extensions" OFF)
+option(COLLECT_STATS "Collect stats" OFF)
 option(ENABLE_SPM "Enable shedskin dependency management" OFF)
 option(ENABLE_CONAN "Enable conan for dependency management" OFF)
 option(ENABLE_EXTERNAL_PROJECT "Enable ExternalProject for dependency mgmt" OFF)
+
+option(ENABLE_WARNINGS "Enable -Wall type of warnings" ON)
+
+# -----------------------------------------------------------------------------
+# reporting
+
+message("Project: " ${PROJECT_NAME})
+message("Build type: " ${CMAKE_BUILD_TYPE})
+message("")
+
+# -----------------------------------------------------------------------------
+# warnings
+
+if("${PROJECT_SOURCE_DIR}" STREQUAL "${PROJECT_BINARY_DIR}")
+   message(FATAL_ERROR "In-source builds are not allowed.")
+endif()
 
 # -----------------------------------------------------------------------------
 # find python executable and shedskin package path
@@ -48,7 +68,12 @@ include_directories(
 # dependency mgmt solutions
 
 if(ENABLE_SPM)
-    set(SPM_DEPS ${CMAKE_BINARY_DIR}/deps)
+    execute_process(
+        COMMAND ${Python_EXECUTABLE} -c "from shedskin import cmake; cmake.user_cache_dir()"
+        OUTPUT_VARIABLE SPM_DEPS
+        COMMAND_ERROR_IS_FATAL ANY
+    )
+    message(STATUS "SPM_DEPS: ${SPM_DEPS}")
     set(SPM_LIB_DIRS ${SPM_DEPS}/lib)
     set(SPM_INCLUDE_DIRS ${SPM_DEPS}/include)
 
@@ -87,7 +112,7 @@ endif()
 # includes
 list(APPEND CMAKE_MODULE_PATH "${SHEDSKIN}/resources/cmake")
 include(utils)
-include(fn_add_shedskin_product)
+include(fn_add_shedskin_product)    # can build both executable and extension
 
 # -----------------------------------------------------------------------
 # any 'test_*' folders are automatically treated as tests
@@ -118,3 +143,4 @@ endif()
 
 # -----------------------------------------------------------------------
 # add subdirectories here
+add_subdirectory(test_builtin_sorted)

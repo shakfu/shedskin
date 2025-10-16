@@ -92,6 +92,12 @@ public:
     __ss_bool isdisjoint(set<T> *s);
     __ss_bool isdisjoint(pyiter<T> *s);
 
+    // Bring base class comparison operators into scope to avoid hiding warnings
+    using pyobj::__gt__;
+    using pyobj::__lt__;
+    using pyobj::__ge__;
+    using pyobj::__le__;
+
     __ss_bool __gt__(set<T> *s);
     __ss_bool __lt__(set<T> *s);
     __ss_bool __ge__(set<T> *s);
