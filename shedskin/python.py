@@ -44,6 +44,8 @@ import sys
 from typing import (TYPE_CHECKING, List, NamedTuple, Optional, Tuple,
                     TypeAlias, Union)
 
+from .exceptions import ParseError
+
 if TYPE_CHECKING:
     from . import config, graph, infer
 
@@ -370,8 +372,7 @@ def parse_file(name: pathlib.Path) -> ast.Module:
     try:
         return ast.parse(filebuf)
     except SyntaxError as s:
-        print("*ERROR* %s:%s: %s" % (name, str(s.lineno), s.msg))
-        sys.exit(1)
+        raise ParseError(f"{name}:{s.lineno}: {s.msg}")
 
 
 def find_module(

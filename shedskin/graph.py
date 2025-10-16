@@ -39,6 +39,7 @@ import sys
 from typing import TYPE_CHECKING, Any, List, Optional, Tuple, TypeAlias, Union
 
 from . import ast_utils, error, infer, python
+from .exceptions import InvalidInputError
 
 if TYPE_CHECKING:
     from . import config
@@ -2668,11 +2669,9 @@ def parse_module(
     """Parse a module"""
     # --- valid name?
     if not re.match("^[a-zA-Z0-9_.]+$", name):
-        print(
-            "*ERROR*:%s.py: module names should consist of letters, digits and underscores"
-            % name
+        raise InvalidInputError(
+            f"{name}.py: module names should consist of letters, digits and underscores"
         )
-        sys.exit(1)
 
     # --- create module
     try:

@@ -17,6 +17,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, List, Optional, Set, Tuple, TypeAlias, Union
 
+from .exceptions import InvalidInputError
+
 if TYPE_CHECKING:
     from . import infer, python
     from .utils import ProgressBar
@@ -165,11 +167,10 @@ class CompilerPaths:
         elif os.path.isdir(system_libdir):
             libdirs = [system_libdir]
         else:
-            print(
-                f"*ERROR* Could not find lib directory in {shedskin_libdir} "
-                f"or {system_libdir}.\n"
+            raise InvalidInputError(
+                f"Could not find lib directory in {shedskin_libdir} "
+                f"or {system_libdir}"
             )
-            sys.exit(1)
 
         return cls(
             shedskin_lib=Path(shedskin_libdir),

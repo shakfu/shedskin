@@ -573,7 +573,34 @@ See `CPP_MODULE_REFACTOR.md` for complete details.
 - ✅ Reduced merge conflict potential
 - ✅ Lower onboarding barrier
 
-#### 2. Global State Management
+#### 2. Error Handling
+
+**Status**: ✅ **FIXED** (2025-10-16)
+
+**Problem**: Hard `sys.exit()` calls prevented error recovery and testing.
+
+**Changes Made**:
+- Replaced all 8 `sys.exit()` calls with proper exceptions
+- Created structured exception hierarchy (`ShedskinException`, `InvalidInputError`, `ParseError`, etc.)
+- Added top-level exception handling in `commandline()` method
+- Improved error messages with context
+
+**Files Modified**:
+- `shedskin/__init__.py` - 5 sys.exit() replaced
+- `shedskin/compiler_config.py` - 1 sys.exit() replaced
+- `shedskin/graph.py` - 1 sys.exit() replaced
+- `shedskin/python.py` - 1 sys.exit() replaced
+
+**Benefits**:
+- ✅ Testable error conditions
+- ✅ Better error messages
+- ✅ Graceful error handling
+- ✅ Usable as a library/API
+- ✅ 100% backward compatible
+
+See `ERROR_HANDLING_FIX_2025-10-16.md` for complete details.
+
+#### 3. Global State Management
 
 **Problem**: Heavy use of global `GlobalInfo` class.
 
@@ -812,10 +839,11 @@ s = "".join(str(x) for x in items)
    - ✅ Fixed missing ast_utils imports
    - Actual effort: Initial refactor + 1 hour for imports
 
-3. **Improve Error Handling** (Correctness)
-   - Remove hard `sys.exit()` calls
-   - Implement proper exception hierarchy
-   - Estimated effort: 1 day
+3. ~~**Improve Error Handling** (Correctness)~~ ✅ **COMPLETED** (2025-10-16)
+   - ✅ Removed all hard `sys.exit()` calls (8 total)
+   - ✅ Implemented proper exception hierarchy
+   - ✅ Added top-level exception handling
+   - Actual effort: 3 hours
 
 4. **Fix C-style Casts** (Type Safety)
    - Replace C-style casts with `static_cast`/`dynamic_cast`
@@ -919,7 +947,7 @@ s = "".join(str(x) for x in items)
 1. ~~Command injection vulnerability (`os.system()` usage)~~ ✅ **FIXED** (2025-10-16)
 2. ~~Monolithic 4,389-line code generator module~~ ✅ **FIXED** (2025-10-16)
 3. Heavy reliance on global state
-4. Hard error exits preventing graceful error handling
+4. ~~Hard error exits preventing graceful error handling~~ ✅ **FIXED** (2025-10-16)
 5. 80+ unresolved technical debt markers (TODO/XXX)
 
 **Overall Assessment**:
@@ -929,7 +957,7 @@ Shedskin demonstrates strong compiler engineering with mature algorithms. The re
 
 **Phase 1** (1-2 weeks): Security & Critical Fixes
 - ✅ Fix command injection (COMPLETED - 2025-10-16)
-- Improve error handling
+- ✅ Improve error handling (COMPLETED - 2025-10-16)
 - Fix type safety issues
 
 **Phase 2** (1 month): Architecture Improvements
@@ -982,6 +1010,7 @@ With these improvements, Shedskin could become significantly more maintainable w
   - cpp.py module refactoring (2025-10-16)
   - Missing ast_utils import fixes (2025-10-16)
   - Command injection vulnerability fix (2025-10-16)
+  - Error handling improvements (2025-10-16)
 
 ---
 

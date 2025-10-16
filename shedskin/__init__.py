@@ -19,6 +19,7 @@ from typing import List, Optional
 
 from . import cmake, config, cpp, error, graph, infer, log, makefile, stats
 from .subprocess_utils import run_executable, enable_windows_color_output
+from .exceptions import InvalidInputError, ShedskinException
 
 
 class Shedskin:
@@ -60,7 +61,7 @@ class Shedskin:
             #   check for __main__ for exe
             #   check for __init__ for ext
             self.log.error("module_path is a directory: '%s'", module_path)
-            sys.exit(1)
+            raise InvalidInputError(f"module_path is a directory: '{module_path}'")
 
         if path.parent != pathlib.Path('.'): # path is in current dir
             os.chdir(path.parent)
@@ -70,7 +71,7 @@ class Shedskin:
             path = path.with_suffix('.py')
         if not path.is_file():
             self.log.error("no such file: '%s'", path)
-            sys.exit(1)
+            raise InvalidInputError(f"no such file: '{path}'")
         self.gx.module_path = path.absolute()
         return path.stem
 
@@ -106,7 +107,7 @@ class Shedskin:
             if args.int128:
                 if platform.system() == "Windows":
                     self.log.error("--int128 not supported on windows")
-                    sys.exit(1)
+                    raise InvalidInputError("--int128 not supported on Windows")
                 gx.int128 = True
 
             if args.float32:
@@ -137,7 +138,7 @@ class Shedskin:
                 if args.flags:
                     if not os.path.isfile(args.flags):
                         self.log.error("no such file: '%s'", args.flags)
-                        sys.exit(1)
+                        raise InvalidInputError(f"no such file: '{args.flags}'")
                     gx.flags = args.flags
 
             if args.outputdir:
@@ -162,7 +163,7 @@ class Shedskin:
         major, minor = sys.version_info[:2]
         if (major, minor) not in [(3, 8), (3, 9), (3, 10), (3, 11), (3, 12), (3, 13)]:
             self.log.error('Shed Skin is not compatible with this version of Python')
-            sys.exit(1)
+            raise InvalidInputError(f'Shed Skin is not compatible with Python {major}.{minor}')
 
         return gx
 
@@ -462,27 +463,37 @@ class Shedskin:
         args = parser.parse_args(args=bypassargs)
         # print(args)
 
-        ss = cls(args)
+        try:
+            ss = cls(args)
 
-        ss.log.info('*** SHED SKIN Python-to-C++ Compiler 0.9.10 ***')
-        ss.log.info('Copyright 2005-2024 Mark Dufour and contributors; License GNU GPL version 3 (See LICENSE)')
-        ss.log.info('')
+            ss.log.info('*** SHED SKIN Python-to-C++ Compiler 0.9.10 ***')
+            ss.log.info('Copyright 2005-2024 Mark Dufour and contributors; License GNU GPL version 3 (See LICENSE)')
+            ss.log.info('')
 
-        if args.subcmd == 'analyze':
-            ss.analyze()
+            if args.subcmd == 'analyze':
+                ss.analyze()
 
-        if args.subcmd == 'translate':
-            ss.translate()
+            if args.subcmd == 'translate':
+                ss.translate()
 
-        if args.subcmd == 'build':
-            ss.build()
+            if args.subcmd == 'build':
+                ss.build()
 
-        if args.subcmd == 'test':
-            ss.test()
+            if args.subcmd == 'test':
+                ss.test()
 
-        if args.subcmd == 'run':
-            ss.build()
-            ss.run()
+            if args.subcmd == 'run':
+                ss.build()
+                ss.run()
+
+        except ShedskinException as e:
+            # Log the error and exit cleanly with error code
+            logging.error(str(e))
+            sys.exit(1)
+        except KeyboardInterrupt:
+            # Handle Ctrl+C gracefully
+            print("\n\nInterrupted by user")
+            sys.exit(130)  # Standard exit code for SIGINT
 
 
 def pkg_path() -> None:
