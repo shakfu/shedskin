@@ -816,7 +816,11 @@ def propagate(gx: "config.GlobalInfo") -> None:
                 if t in gx.cnode:
                     callnodes.add(gx.cnode[t])
 
-            for b in a.out.copy():  # XXX can change...?
+            # Use .copy() because the out set can change during iteration.
+            # Type inference can add new edges to the constraint graph while
+            # we're iterating, so we iterate over a snapshot to avoid
+            # RuntimeError: Set changed size during iteration.
+            for b in a.out.copy():
                 # for builtin types, the set of instance variables is known, so do not flow into non-existent ones # XXX ifa
                 if isinstance(b.thing, python.Variable) and isinstance(
                     b.thing.parent, python.Class

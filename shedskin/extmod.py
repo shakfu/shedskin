@@ -503,7 +503,10 @@ class ExtensionModule:
         )
         write("    PyModuleDef_HEAD_INIT,")
         write('    "%s",   /* name of module */' % "_".join(self.gv.module.name_list))
-        write("    NULL,   /* module documentation, may be NULL */")  # FIXME
+        # Module documentation is NULL because Shedskin compiles from Python source
+        # without preserving docstrings. Future improvement: Extract and preserve
+        # module-level docstrings during compilation for better Python integration.
+        write("    NULL,   /* module documentation, may be NULL */")
         write(
             "    -1,     /* size of per-interpreter state of the module or -1 if the module keeps state in global variables. */"
         )
@@ -597,11 +600,14 @@ class ExtensionModule:
         )
         write("} %sObject;\n" % clname(cl))
 
-        ## FIXME: temporarly hardcoded
-        ## this should include type struct members
-        ## https://docs.python.org/3/c-api/structures.html
+        # PyMemberDef allows exposing C struct members to Python.
+        # Currently empty because Shedskin uses getter/setter methods instead.
+        # This approach provides better control over type conversion between
+        # C++ and Python types. See: https://docs.python.org/3/c-api/structures.html
+        # Future improvement: Could expose simple typed attributes directly for
+        # better performance, but would require careful type mapping.
         write("static PyMemberDef %sMembers[] = {" % clname(cl))
-        write("    {NULL}\n};\n")
+        write("    {NULL}  /* Sentinel */\n};\n")
 
         # methods
         for func in funcs:

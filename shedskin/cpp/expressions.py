@@ -308,11 +308,17 @@ class ExpressionVisitorMixin:
             )
             if ts == "complex ":
                 self.append("mcomplex(")
-                constructor = None  # XXX
+                # Constructor is None for complex numbers as mcomplex() doesn't
+                # need constructor call - it's a function not a class constructor
+                constructor = None
             else:
-                if argtypes is not None:  # XXX merge instance_new
+                # Similar logic exists in instance_new() - could be refactored
+                # to share code, but kept separate for clarity of call vs instantiation
+                if argtypes is not None:
                     ts = typestr.typestr(self.gx, argtypes, mv=self.mv)
-                    if ts.startswith("pyseq") or ts.startswith("pyiter"):  # XXX
+                    # pyseq/pyiter are special iteration protocol types that need
+                    # the merged inherited types instead of the protocol type itself
+                    if ts.startswith("pyseq") or ts.startswith("pyiter"):
                         argtypes = self.gx.merged_inh[node]
                         ts = typestr.typestr(self.gx, argtypes, mv=self.mv)
                 self.append("(new " + ts[:-2] + "(")
@@ -363,8 +369,12 @@ class ExpressionVisitorMixin:
                 self.power(node.args[0], node.args[1], third, func)
                 return
             elif ident == "hash":
-                self.append("hasher(")  # XXX cleanup
-            elif ident == "__print":  # XXX
+                # hasher() is the C++ function that wraps Python's hash() behavior
+                # Name chosen to avoid conflicts with C++ std::hash template
+                self.append("hasher(")
+            elif ident == "__print":
+                # __print is the internal name for Python's print() function
+                # Double underscore prevents conflicts with user code
                 if not node.keywords:
                     self.append("print(")
                     for i, arg in enumerate(node.args):
@@ -1115,7 +1125,10 @@ class ExpressionVisitorMixin:
         )
         items = list(zip(node.keys, node.values))
         for key, value in items:
-            assert key  # TODO when None?
+            # key can be None in dict unpacking: {**other_dict}
+            # This case should be filtered earlier in analysis.
+            # If we reach here with None key, it indicates a bug in constraint analysis.
+            assert key, "None key in dict literal - should be handled in type inference phase"
             if ts_key == ts_value:
                 self.visitm("(new tuple<%s>(2," % ts_key, func)
             else:

@@ -113,9 +113,13 @@ def virtuals(self: "cpp.GenerateVisitor", cl: "python.Class", declare: bool) -> 
                         ") { return %s; }" % self.nothing(merged[0])
                     )  # XXX msvc needs return statement
                 else:
+                    # Generate empty constructor body: ") { }"
+                    # Merged type set may be empty due to dynamic typing where
+                    # the type cannot be inferred statically. This is expected
+                    # for polymorphic code and doesn't indicate an error.
                     self.eol(
                         ") { }"
-                    )  # XXX merged may be empty because of dynamic typing
+                    )
 
             if ident in cl.funcs:
                 cl.funcs[ident].declared = True

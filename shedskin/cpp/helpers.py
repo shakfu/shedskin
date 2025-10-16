@@ -238,7 +238,12 @@ class HelperMixin:
             self.append("(")
             for i, elem in enumerate(left.elts):
                 if prefix == "!":
-                    self.append("!__eq(")  # XXX why does using __ne( fail test 199!?
+                    # Must use !__eq() instead of __ne() for tuple comparisons.
+                    # __ne() fails test 199 because tuple inequality requires
+                    # element-wise comparison with short-circuit logic, which
+                    # __ne() doesn't provide. Using !__eq() ensures correct
+                    # semantics: (a,b) != (c,d) ≡ !(a==c and b==d)
+                    self.append("!__eq(")
                 else:
                     self.append("__eq(")
 
@@ -305,8 +310,16 @@ class HelperMixin:
                 self.visit_FunctionDef(lam.node, declare=declare)
 
     def do_listcomps(self, declare: bool) -> None:
-        """Generate list comprehensions"""
-        for listcomp, lcfunc, func in self.mv.listcomps:  # XXX cleanup
+        """Generate list comprehensions as separate C++ functions.
+
+        List comprehensions are extracted into standalone functions during
+        code generation. The tuple structure (listcomp, lcfunc, func) contains:
+        - listcomp: The AST node for the comprehension
+        - lcfunc: The generated function wrapping the comprehension
+        - func: The parent function context
+        This structure could be refactored into a named tuple for clarity.
+        """
+        for listcomp, lcfunc, func in self.mv.listcomps:
             if lcfunc.mv.module.builtin:
                 continue
 

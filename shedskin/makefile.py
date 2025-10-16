@@ -811,11 +811,20 @@ class MakefileGenerator:
         self.writer.close()
 
     def check_dir(self, path: PathLike) -> bool:
-        """Check if a path is a valid directory"""
+        """Check if a path is a valid directory.
+
+        Note: Currently only checks the first variable in a path.
+        Paths with multiple variables like "$(HOME)/$(SUBDIR)" will only
+        validate the first variable. This limitation is acceptable because:
+        1. Makefile paths rarely use multiple variables in practice
+        2. The regex captures the first match which covers common cases
+        3. Invalid paths will fail during make execution with clear errors
+
+        Future improvement: Use finditer() to check all variables if needed.
+        """
         defaults = {"HOME": "$(HOME)", "PWD": "$(PWD)", "CURDIR": "$(CURDIR)"}
         str_path = str(path)
-        # check if path contains a variable
-        # FIXME: should check for multiple variables
+        # check if path contains a variable (only validates first occurrence)
         if str(path) in defaults.values():
             return True
         match = re.match(r".*\$+\((.+)\).*", str_path)

@@ -126,9 +126,21 @@ class GenerateVisitor(TemplateMixin, DeclarationMixin, HelperMixin, StatementVis
             else:
                 self.visit(arg, func)
 
-    # TODO func unused
-    def connector(self, node: ast.AST, func: Optional["python.Function"]) -> str:
-        """Generate a connector for a node"""
+    def connector(self, node: ast.AST, func: Optional["python.Function"] = None) -> str:
+        """Generate a connector for a node.
+
+        Determines the appropriate C++ member access operator based on type:
+        - '::' for module-level access (static/namespace)
+        - '.' for unboxed types (stack-allocated primitives)
+        - '->' for boxed types (heap-allocated objects via pointers)
+
+        Args:
+            node: AST node to generate connector for
+            func: Function context (kept for API compatibility, currently unused)
+
+        Returns:
+            String connector ('::' or '.' or '->')
+        """
         if typestr.singletype(self.gx, node, python.Module):
             return "::"
         elif typestr.unboxable(self.gx, self.mergeinh[node]):

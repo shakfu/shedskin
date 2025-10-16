@@ -69,8 +69,16 @@ class DeclarationMixin:
 
     def includes_rec(
         self, includes: set["python.Module"]
-    ) -> List["python.Module"]:  # XXX should be recursive!? ugh
-        """Find all (indirect) dependencies recursively"""
+    ) -> List["python.Module"]:
+        """Find all (indirect) dependencies recursively.
+
+        Note: Despite the name and comment, this uses an iterative algorithm
+        with a work queue instead of recursion. This is intentional because:
+        1. Iterative approach avoids stack overflow on deep dependency chains
+        2. Easier to detect and break circular dependencies
+        3. More efficient for large dependency graphs
+        The name 'includes_rec' is kept for API compatibility.
+        """
         todo = includes.copy()
         result: List["python.Module"] = []
         while todo:

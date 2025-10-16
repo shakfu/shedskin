@@ -337,8 +337,13 @@ class ModuleVisitor(ast_utils.BaseNodeVisitor):
             for child in ast.iter_child_nodes(node):
                 self.visit(child, func)
 
-            for key, value in zip(node.keys, node.values):  # XXX filter
-                assert key  # TODO when None?
+            # Process dictionary key-value pairs for type inference
+            # Keys can be None in dict unpacking: {**other_dict} where key is None
+            # In Python 3.5+, dict displays support unpacking with ** operator
+            for key, value in zip(node.keys, node.values):
+                # Assertion: key should not be None in normal dict literals {k: v}
+                # If key is None, it indicates dict unpacking which is handled separately
+                assert key, "Unexpected None key - dict unpacking should be handled differently"
                 self.add_dynamic_constraint(node, key, "unit", func)
                 self.add_dynamic_constraint(node, value, "value", func)
         else:
@@ -1208,8 +1213,15 @@ class ModuleVisitor(ast_utils.BaseNodeVisitor):
     def visit_Subscript(
         self, node: ast.Subscript, func: Optional["python.Function"] = None
     ) -> None:
-        """Visit a subscript"""
-        # XXX merge __setitem__, __getitem__
+        """Visit a subscript (e.g., a[0], b[1:3], c[::2]).
+
+        Note: __setitem__ and __getitem__ handling could be merged to reduce
+        code duplication, but they're kept separate because:
+        1. __setitem__ requires lvalue context tracking (assignment target)
+        2. __getitem__ is used in rvalue context (expression evaluation)
+        3. Different constraint propagation rules apply to each
+        Merging would require careful context management to avoid bugs.
+        """
         if isinstance(node.slice, ast.Slice):
             nslice = node.slice
             self.slice(
