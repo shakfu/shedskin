@@ -134,6 +134,7 @@ def validate_input_file(
     # Check for path traversal to sensitive areas
     sensitive_dirs = [
         Path('/etc'),
+        Path('/private/etc'),  # macOS resolves /etc to /private/etc
         Path('/boot'),
         Path('/sys'),
         Path('/proc'),
@@ -195,6 +196,7 @@ def validate_directory(
     # Check for sensitive system directories
     sensitive_dirs = [
         Path('/etc'),
+        Path('/private/etc'),  # macOS resolves /etc to /private/etc
         Path('/boot'),
         Path('/sys'),
         Path('/proc'),

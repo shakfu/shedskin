@@ -55,6 +55,7 @@ include = [
 [dependency-groups]
 dev = [
     "pytest>=8.3.5",
+    "pytest-cov>=5.0.0",
 ]
 
 [project.scripts]
@@ -66,3 +67,34 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.urls]
 "Bug Tracker" = "https://github.com/shedskin/shedskin/issues"
+
+[tool.pytest.ini_options]
+testpaths = ["unit_tests", "tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-v --strict-markers"
+markers = [
+    "unit: Unit tests for individual modules",
+    "integration: Integration tests (compile → run)",
+    "slow: Slow-running tests",
+]
+
+[tool.coverage.run]
+source = ["shedskin"]
+omit = [
+    "*/tests/*",
+    "*/unit_tests/*",
+    "*/__pycache__/*",
+    "*/site-packages/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+]
