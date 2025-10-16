@@ -1,24 +1,5 @@
 # Code Review Priorities
 
-Phase 1: Security & Critical Fixes (1-2 weeks)
-
-3. [x] Fix C-style Casts 🟡 HIGH
-
-- Locations: Throughout C++ template files (list.hpp, dict.hpp, str.hpp)
-- Issue: Unsafe C-style casts like (list<T> *)p hide conversion issues
-- Fix: Replace with static_cast/dynamic_cast + nullptr checks
-- Effort: 4-6 hours
-- Examples:
-  - list.hpp:159 - Array indexing cast
-  - dict.hpp:167 - Equality comparison cast
-
-4. Path Traversal Vulnerability 🟡 HIGH
-
-- Location: Output directory handling
-- Issue: User-provided paths not validated
-- Fix: Use Path.resolve() with base path validation
-- Effort: 3-4 hours
-
 Phase 2: Architecture Improvements (1 month)
 
 5. [x] Refactor GlobalInfo 🟡 MEDIUM

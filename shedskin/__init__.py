@@ -20,6 +20,7 @@ from typing import List, Optional
 from . import cmake, config, cpp, error, graph, infer, log, makefile, stats
 from .subprocess_utils import run_executable, enable_windows_color_output
 from .exceptions import InvalidInputError, ShedskinException
+from .path_security import validate_output_path, validate_input_file, validate_directory
 
 
 class Shedskin:
@@ -136,15 +137,23 @@ class Shedskin:
                     gx.makefile_name = args.makefile
 
                 if args.flags:
-                    if not os.path.isfile(args.flags):
-                        self.log.error("no such file: '%s'", args.flags)
-                        raise InvalidInputError(f"no such file: '{args.flags}'")
-                    gx.flags = args.flags
+                    # Validate flags file path securely
+                    try:
+                        validated_flags = validate_input_file(args.flags, must_exist=True)
+                        gx.flags = str(validated_flags)
+                    except InvalidInputError as e:
+                        self.log.error("invalid flags file: '%s'", args.flags)
+                        raise
 
             if args.outputdir:
-                if not os.path.exists(args.outputdir):
-                    os.makedirs(args.outputdir, exist_ok=True)
-                gx.outputdir = args.outputdir
+                # Validate and create output directory securely
+                validated_dir = validate_output_path(
+                    args.outputdir,
+                    allow_absolute=True  # Allow absolute paths for output
+                )
+                # Create directory if it doesn't exist
+                validated_dir.mkdir(parents=True, exist_ok=True)
+                gx.outputdir = str(validated_dir)
 
             if args.silent:
                 gx.silent = True
@@ -157,7 +166,9 @@ class Shedskin:
                 gx.executable_product = True
 
             if args.extra_lib:
-                gx.libdirs = [args.extra_lib] + gx.libdirs
+                # Validate extra library directory
+                validated_libdir = validate_directory(args.extra_lib, must_exist=True)
+                gx.libdirs = [str(validated_libdir)] + gx.libdirs
 
         # --- some checks
         major, minor = sys.version_info[:2]
