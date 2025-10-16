@@ -339,8 +339,6 @@ class ExtensionModule:
                     write("    (PyCFunction)%s_%s," % (clname(f.parent), overload))
             else:
                 write("    0,")
-        # Initialize remaining PyNumberMethods fields to suppress -Wmissing-field-initializers
-        write("    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0")
         write("};\n")
         if cl and python.def_class(self.gx, "Exception") not in cl.ancestors():
             write(
@@ -354,15 +352,15 @@ class ExtensionModule:
         write("static PyMethodDef %sMethods[] = {" % ident)
         if not cl:
             write(
-                '    {(char *)"__newobj__", (PyCFunction)(void(*)(void))__ss__newobj__, METH_VARARGS | METH_KEYWORDS, (char *)""},'
+                '    {(char *)"__newobj__", (PyCFunction)__ss__newobj__, METH_VARARGS | METH_KEYWORDS, (char *)""},'
             )
         elif cl and python.def_class(self.gx, "Exception") not in cl.ancestors():
             write(
-                '    {(char *)"__reduce__", (PyCFunction)(void(*)(void))%s__reduce__, METH_VARARGS | METH_KEYWORDS, (char *)""},'
+                '    {(char *)"__reduce__", (PyCFunction)%s__reduce__, METH_VARARGS | METH_KEYWORDS, (char *)""},'
                 % ident
             )
             write(
-                '    {(char *)"__setstate__", (PyCFunction)(void(*)(void))%s__setstate__, METH_VARARGS | METH_KEYWORDS, (char *)""},'
+                '    {(char *)"__setstate__", (PyCFunction)%s__setstate__, METH_VARARGS | METH_KEYWORDS, (char *)""},'
                 % ident
             )
         for func in funcs:
@@ -371,7 +369,7 @@ class ExtensionModule:
             else:
                 id = "Global_" + "_".join(self.gv.module.name_list) + "_" + func.ident
             write(
-                '    {(char *)"%(id)s", (PyCFunction)(void(*)(void))%(id2)s, METH_VARARGS | METH_KEYWORDS, (char *)""},'
+                '    {(char *)"%(id)s", (PyCFunction)%(id2)s, METH_VARARGS | METH_KEYWORDS, (char *)""},'
                 % {"id": func.ident, "id2": id}
             )
         # write("    {NULL}\n};\n")
@@ -512,11 +510,7 @@ class ExtensionModule:
         write(
             "    -1,     /* size of per-interpreter state of the module or -1 if the module keeps state in global variables. */"
         )
-        write("    %s," % "Global_" + "_".join(self.gv.module.name_list) + "Methods")
-        write("    NULL,   /* m_slots */")
-        write("    NULL,   /* m_traverse */")
-        write("    NULL,   /* m_clear */")
-        write("    NULL    /* m_free */")
+        write("    %s" % "Global_" + "_".join(self.gv.module.name_list) + "Methods")
         write("};")
 
         # # add types to module
@@ -613,7 +607,7 @@ class ExtensionModule:
         # Future improvement: Could expose simple typed attributes directly for
         # better performance, but would require careful type mapping.
         write("static PyMemberDef %sMembers[] = {" % clname(cl))
-        write("    {NULL, 0, 0, 0, NULL}  /* Sentinel */\n};\n")
+        write("    {NULL}  /* Sentinel */\n};\n")
 
         # methods
         for func in funcs:
@@ -699,7 +693,7 @@ class ExtensionModule:
                 '    {(char *)"%s", (getter)__ss_get_%s_%s, (setter)__ss_set_%s_%s, (char *)"", NULL},'
                 % (var.name, clname(cl), var.name, clname(cl), var.name)
             )
-        write("    {NULL, NULL, NULL, NULL, NULL}  /* Sentinel */\n};\n")
+        write("    {NULL}\n};\n")
 
         # python type (new)
         write("PyTypeObject %sObjectType = {" % clname(cl))
@@ -753,16 +747,6 @@ class ExtensionModule:
             write("    0,")
         write("    0,")
         write("    %sNew," % clname(cl))
-        write("    0,      /* tp_free */")
-        write("    0,      /* tp_is_gc */")
-        write("    0,      /* tp_bases */")
-        write("    0,      /* tp_mro */")
-        write("    0,      /* tp_cache */")
-        write("    0,      /* tp_subclasses */")
-        write("    0,      /* tp_weaklist */")
-        write("    0,      /* tp_del */")
-        write("    0,      /* tp_version_tag */")
-        write("    0       /* tp_finalize */")
         write("};\n")
 
         self.do_reduce_setstate(cl, vars)

@@ -33,7 +33,7 @@
 #define FOR_IN_ENUMERATE(i, m, temp, n) \
     __ ## temp = m; \
     for(__ ## n = 0; (unsigned int)__ ## n < (__ ## temp)->units.size(); __ ## n ++) { \
-        i = (__ ## temp)->units[static_cast<size_t>(__ ## n)]; \
+        i = (__ ## temp)->units[__ ## n]; \
 
 #define FOR_IN_ENUMERATE_STR(i, m, temp, n) \
     __ ## temp = m; \

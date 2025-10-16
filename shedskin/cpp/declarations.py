@@ -789,9 +789,9 @@ class DeclarationMixin:
                 )
             ):
                 self.start(
-                    "__ss_result->units[static_cast<size_t>("
+                    "__ss_result->units["
                     + self.mv.tempcount[node.generators[0].iter]
-                    + ")] = "
+                    + "] = "
                 )
                 self.visit(node.elt, lcfunc)
             else:

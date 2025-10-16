@@ -124,7 +124,6 @@ __ss_int spawnve(__ss_int mode, str *file, list<str *> *args, dict<str *, str *>
 __ss_int spawnvpe(__ss_int mode, str *file, list<str *> *args, dict<str *, str *> *env);
 
 template <class ... Args> void *execlp(__ss_int n, str *file, Args ... args) {
-    (void)n;  // suppress unused parameter warning
     list<str *> *vals = new list<str *>();
     (vals->append(args), ...);
     execvp(file, vals);
@@ -132,7 +131,6 @@ template <class ... Args> void *execlp(__ss_int n, str *file, Args ... args) {
 }
 
 template <class ... Args> void *execl(__ss_int n, str *file, Args ... args) {
-    (void)n;  // suppress unused parameter warning
     list<str *> *vals = new list<str *>();
     (vals->append(args), ...);
     execv(file, vals);
@@ -141,7 +139,6 @@ template <class ... Args> void *execl(__ss_int n, str *file, Args ... args) {
 
 
 template <class ... Args> void *execle(__ss_int n, str *file, dict<str *, str *> *env, Args ... args) {
-    (void)n;  // suppress unused parameter warning
     list<str *> *vals = new list<str *>();
     (vals->append(args), ...);
     execve(file, vals, env);
@@ -149,7 +146,6 @@ template <class ... Args> void *execle(__ss_int n, str *file, dict<str *, str *>
 }
 
 template <class ... Args> void *execlpe(__ss_int n, str *file, dict<str *, str *> *env, Args ... args) {
-    (void)n;  // suppress unused parameter warning
     list<str *> *vals = new list<str *>();
     (vals->append(args), ...);
     execvpe(file, vals, env);
@@ -158,28 +154,24 @@ template <class ... Args> void *execlpe(__ss_int n, str *file, dict<str *, str *
 
 
 template <class ... Args> __ss_int spawnl(__ss_int n, __ss_int mode, str *file, Args ... args) {
-    (void)n;  // suppress unused parameter warning
     list<str *> *vals = new list<str *>();
     (vals->append(args), ...);
     return spawnv(mode, file, vals);
 }
 
 template <class ... Args> __ss_int spawnlp(__ss_int n, __ss_int mode, str *file, Args ... args) {
-    (void)n;  // suppress unused parameter warning
     list<str *> *vals = new list<str *>();
     (vals->append(args), ...);
     return spawnvp(mode, file, vals);
 }
 
 template <class ... Args> __ss_int spawnle(__ss_int n, __ss_int mode, str *file, dict<str *, str *> *env, Args ... args) {
-    (void)n;  // suppress unused parameter warning
     list<str *> *vals = new list<str *>();
     (vals->append(args), ...);
     return spawnve(mode, file, vals, env);
 }
 
 template <class ... Args> __ss_int spawnlpe(__ss_int n, __ss_int mode, str *file, dict<str *, str *> *env, Args ... args) {
-    (void)n;  // suppress unused parameter warning
     list<str *> *vals = new list<str *>();
     (vals->append(args), ...);
     return spawnvpe(mode, file, vals, env);
