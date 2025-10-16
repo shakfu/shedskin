@@ -2,13 +2,6 @@
 
 Phase 2: Architecture Improvements (1 month)
 
-6. Add Unit Tests 🟡 MEDIUM
-
-- Current: Good integration tests, lacking unit tests
-- Focus: New cpp/ modules, infer.py, graph.py
-- Effort: 1 week
-- Benefits: Better test coverage, easier debugging, regression prevention
-
 Phase 3: Technical Debt (2-3 months)
 
 7. Address Technical Debt Markers 🟢 LOW-MEDIUM

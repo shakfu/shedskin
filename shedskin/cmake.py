@@ -188,7 +188,7 @@ class ShedskinDependencyManager:
             self.shellcmd(f"git clone --depth=1 {repo} {to_dir}")
 
     def cmake_generate(
-        self, src_dir: Pathlike, build_dir: Pathlike, prefix: Pathlike, **options: bool
+        self, src_dir: Pathlike, build_dir: Pathlike, prefix: Pathlike, **options: Union[bool, int, float, str]
     ) -> None:
         """Activate cmake configuration / generation stage"""
         opts = " ".join(f"-D{k}={v}" for k, v in options.items())
