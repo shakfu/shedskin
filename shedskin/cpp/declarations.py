@@ -13,7 +13,7 @@ This module contains methods for generating C++ declarations and definitions:
 import ast
 from typing import TYPE_CHECKING, Any, Iterator, List, Optional, Tuple, TypeAlias
 
-from .. import infer, python, typestr, virtual
+from .. import ast_utils, infer, python, typestr, virtual
 
 if TYPE_CHECKING:
     pass

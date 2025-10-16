@@ -11,7 +11,7 @@ This module contains helper methods including:
 import ast
 from typing import TYPE_CHECKING, Any, List, Optional, Tuple, TypeAlias, Union
 
-from .. import python, typestr
+from .. import ast_utils, python, typestr
 
 if TYPE_CHECKING:
     pass
