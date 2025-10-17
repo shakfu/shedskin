@@ -1,4 +1,6 @@
-.PHONY: help install dev sync test test-unit test-exe test-ext test-all test-modified test-single clean build lint format typecheck coverage docs
+.PHONY: help install dev sync test test-unit test-exe test-ext \
+		test-all test-modified test-single test-log clean build lint \
+		format typecheck coverage docs
 
 help:
 	@echo "Shedskin Development Makefile"
@@ -17,6 +19,7 @@ help:
 	@echo "  make test-modified  Run recently modified tests only"
 	@echo "  make test-single    Run single test (usage: make test-single TEST=test_builtin_iter)"
 	@echo "  make test-errs      Run error/warning message tests"
+	@echo "  make test-log       Run all executable tests and store output in tests.log"
 	@echo ""
 	@echo "Quality Commands:"
 	@echo "  make lint           Run mypy type checking"
@@ -71,6 +74,10 @@ test-single:
 test-errs:
 	cd tests && uv run shedskin test --run-errs
 
+test-log:
+	cd tests && uv run shedskin test --reset -x &> ../tests.log
+
+
 # Quality commands
 lint:
 	uv run mypy shedskin/
@@ -98,8 +105,7 @@ clean:
 	find . -type f -name "*.pyo" -delete
 
 reset:
-	rm -rf tests/build/
-	cd tests && uv run shedskin test --reset -x
+	rm -rf tests/build
 
 # Documentation
 docs:

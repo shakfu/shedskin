@@ -51,6 +51,9 @@ shedskin/lib/serial.py
 # editor or ide
 .vscode
 
+# logs
+*.log
+
 # claude
 .claude
 CLAUDE.md
