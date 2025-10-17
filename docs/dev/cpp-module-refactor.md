@@ -53,7 +53,7 @@ The `shedskin/cpp.py` module is **4,389 lines** with **145 methods** in a single
 
 ## Proposed Architecture
 
-### 📦 New Package Structure: `shedskin/cpp/`
+###  New Package Structure: `shedskin/cpp/`
 
 ```
 shedskin/cpp/
@@ -298,7 +298,7 @@ __all__ = ['CPPNamer', 'GenerateVisitor', 'generate_code']
 
 ---
 
-### Option B: Incremental (Safer) ✅ **RECOMMENDED**
+### Option B: Incremental (Safer) [x] **RECOMMENDED**
 **Timeline**: 4-5 days
 **Risk**: LOW-MEDIUM
 **Reward**: Same as Option A, but safer
@@ -391,22 +391,22 @@ __all__ = ['CPPNamer', 'GenerateVisitor', 'generate_code']
 ## Success Criteria
 
 ### Code Quality Metrics
-- ✅ No single module > 1,500 lines
-- ✅ Clear separation of concerns
-- ✅ Reduced cyclomatic complexity
-- ✅ Better testability (can mock/test individual components)
+- [x] No single module > 1,500 lines
+- [x] Clear separation of concerns
+- [x] Reduced cyclomatic complexity
+- [x] Better testability (can mock/test individual components)
 
 ### Functional Requirements
-- ✅ All 118+ tests pass
-- ✅ Zero behavioral changes
-- ✅ Backward compatible imports (`from shedskin.cpp import generate_code`)
-- ✅ Generated C++ code identical to before (or provably equivalent)
+- [x] All 118+ tests pass
+- [x] Zero behavioral changes
+- [x] Backward compatible imports (`from shedskin.cpp import generate_code`)
+- [x] Generated C++ code identical to before (or provably equivalent)
 
 ### Developer Experience
-- ✅ Easier to understand code flow
-- ✅ Faster to locate bugs
-- ✅ Simpler to add new AST node support
-- ✅ Better IDE navigation
+- [x] Easier to understand code flow
+- [x] Faster to locate bugs
+- [x] Simpler to add new AST node support
+- [x] Better IDE navigation
 
 ---
 
@@ -420,14 +420,14 @@ __all__ = ['CPPNamer', 'GenerateVisitor', 'generate_code']
 - [ ] Create feature branch: `refactor/split-cpp-module`
 
 ### Migration (Incremental Approach)
-- [x] **Phase 1**: Extract CPPNamer (2 hours) ✅ COMPLETE
+- [x] **Phase 1**: Extract CPPNamer (2 hours) [x] COMPLETE
   - Created cpp/ package structure
   - Extracted CPPNamer to cpp/namer.py (86 lines)
   - Reduced cpp.py from 4,389 to 4,323 lines (66 lines extracted)
   - All 114 unit tests pass
   - Basic and complex compilation tests pass
   - Committed: 91402372
-- [x] **Phase 2**: Extract Output Management (3 hours) ✅ COMPLETE
+- [x] **Phase 2**: Extract Output Management (3 hours) [x] COMPLETE
   - Created cpp/output.py with OutputMixin (193 lines)
   - Extracted output methods: get_output_file, insert_consts, insert_extras
   - Extracted buffer methods: print, output, start, append, eol, indent, deindent
@@ -436,7 +436,7 @@ __all__ = ['CPPNamer', 'GenerateVisitor', 'generate_code']
   - All 114 unit tests pass
   - Basic and complex compilation tests pass
   - Committed: ede504cf
-- [x] **Phase 3**: Split Visitor - Expressions (1 day) ✅ COMPLETE
+- [x] **Phase 3**: Split Visitor - Expressions (1 day) [x] COMPLETE
   - Created cpp/expressions.py with ExpressionVisitorMixin (1,236 lines)
   - Extracted 24 expression visitor methods (~1,223 lines)
   - Methods include: BinOp, UnaryOp, Call, Attribute, Name, Constant, comprehensions, etc.
@@ -445,7 +445,7 @@ __all__ = ['CPPNamer', 'GenerateVisitor', 'generate_code']
   - All 114 unit tests pass
   - Basic and complex compilation tests pass
   - Committed: 6881c98b
-- [x] **Phase 4**: Split Visitor - Statements (1 day) ✅ COMPLETE
+- [x] **Phase 4**: Split Visitor - Statements (1 day) [x] COMPLETE
   - Created cpp/statements.py with StatementVisitorMixin (646 lines)
   - Extracted 22 statement visitor methods (633 lines)
   - Methods include: For, While, If, Try, Assign, FunctionDef, Module, etc.
@@ -454,7 +454,7 @@ __all__ = ['CPPNamer', 'GenerateVisitor', 'generate_code']
   - All 114 unit tests pass
   - Basic and complex compilation tests pass
   - Committed: 74c304d6
-- [x] **Phase 5**: Extract Remaining Modules (1 day) ✅ COMPLETE
+- [x] **Phase 5**: Extract Remaining Modules (1 day) [x] COMPLETE
   - Created cpp/helpers.py with HelperMixin (426 lines)
     - Extracted 18 helper methods (404 lines): do_* methods and optimization helpers
     - Methods include: do_main, do_init_modules, do_fastfor, do_compare, fastfor, fastenumerate, etc.
@@ -541,4 +541,4 @@ If issues arise during migration:
 
 **Author**: Claude (with human oversight)
 **Last Updated**: 2025-10-11
-**Status**: 🚀 In Progress - Phase 5 Complete (83% done - major refactoring complete!)
+**Status**:  In Progress - Phase 5 Complete (83% done - major refactoring complete!)

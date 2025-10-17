@@ -4,7 +4,7 @@
 
 Comprehensive analysis of 253 technical debt markers (TODO/XXX/FIXME) across the Shedskin codebase, with categorization, priority assessment, and actionable recommendations for resolution.
 
-## Status: ✅ ANALYSIS COMPLETE | 🟢 PHASE 2 COMPLETE
+## Status: [x] ANALYSIS COMPLETE | 🟢 PHASE 2 COMPLETE
 
 **Findings:**
 - **Total markers**: 253
@@ -13,11 +13,11 @@ Comprehensive analysis of 253 technical debt markers (TODO/XXX/FIXME) across the
 - **Resolution strategy**: Document, defer, or fix based on priority
 
 **Phase 2 Completion (October 16, 2025):**
-- ✅ **3 FIXME markers** - All documented with explanations
-- ✅ **1 TODO unused parameter** - Documented in cpp/visitor.py
-- ✅ **13 high-priority markers** - Converted to clear documentation
-- ✅ **All tests passing** - 114 unit tests verified
-- ✅ **Build verified** - Code generation working correctly
+- [x] **3 FIXME markers** - All documented with explanations
+- [x] **1 TODO unused parameter** - Documented in cpp/visitor.py
+- [x] **13 high-priority markers** - Converted to clear documentation
+- [x] **All tests passing** - 114 unit tests verified
+- [x] **Build verified** - Code generation working correctly
 
 ---
 
@@ -525,9 +525,9 @@ grep -rn "TODO.*bug\|XXX.*break\|XXX.*crash" shedskin/
 
 ### Phase 1: Analysis and Triage (COMPLETE)
 
-✅ **Inventory all markers** (253 found)
-✅ **Categorize by type** (XXX: 227, TODO: 29, FIXME: 3)
-✅ **Identify priorities** (Critical: 3, High: 10-15, Medium: 40-50, Low: 190+)
+[x] **Inventory all markers** (253 found)
+[x] **Categorize by type** (XXX: 227, TODO: 29, FIXME: 3)
+[x] **Identify priorities** (Critical: 3, High: 10-15, Medium: 40-50, Low: 190+)
 
 ### Phase 2: Quick Wins (1 week)
 
@@ -848,7 +848,7 @@ Fail if marker count increases:
 ---
 
 **Date**: October 16, 2025
-**Status**: ✅ ANALYSIS COMPLETE | 🟢 PHASE 2 COMPLETE
+**Status**: [x] ANALYSIS COMPLETE | 🟢 PHASE 2 COMPLETE
 **Total Markers**: 253
 **Effort to Document**: 1-2 weeks
 **Effort to Fix Critical**: 2-3 days
@@ -861,14 +861,14 @@ Fail if marker count increases:
 ## Phase 2 Completion Report
 
 **Date Completed**: October 16, 2025
-**Status**: ✅ ALL OBJECTIVES MET
+**Status**: [x] ALL OBJECTIVES MET
 **Time Spent**: ~2 hours
-**Tests**: ✅ All 114 unit tests passing
-**Build**: ✅ Code generation verified working
+**Tests**: [x] All 114 unit tests passing
+**Build**: [x] Code generation verified working
 
 ### Objectives Completed
 
-#### 1. FIXME Markers (3/3) ✅
+#### 1. FIXME Markers (3/3) [x]
 
 All 3 FIXME markers have been documented with comprehensive explanations:
 
@@ -887,7 +887,7 @@ All 3 FIXME markers have been documented with comprehensive explanations:
 - **Resolution**: Explained design choice to use getter/setter methods for better type control
 - **Location**: Added comment with link to Python C-API docs and rationale
 
-#### 2. Unused Parameters (1/1) ✅
+#### 2. Unused Parameters (1/1) [x]
 
 **shedskin/cpp/visitor.py:129** - func parameter in connector()
 - **Issue**: TODO comment about unused func parameter
@@ -895,7 +895,7 @@ All 3 FIXME markers have been documented with comprehensive explanations:
 - **Action**: Made parameter optional with default None for API compatibility
 - **Rationale**: Parameter kept for backward compatibility with existing callers
 
-#### 3. High-Priority Markers (13 documented) ✅
+#### 3. High-Priority Markers (13 documented) [x]
 
 Successfully documented 13 high-priority markers with clear explanations:
 
@@ -953,12 +953,12 @@ Successfully documented 13 high-priority markers with clear explanations:
 
 ### Verification Results
 
-**Unit Tests**: ✅ PASS
+**Unit Tests**: [x] PASS
 ```
 114 passed in 0.72s
 ```
 
-**Code Generation**: ✅ PASS
+**Code Generation**: [x] PASS
 ```
 Build succeeded for test.py
 Total time: 00:00:00
@@ -966,12 +966,12 @@ Total time: 00:00:00
 
 ### Impact Assessment
 
-**Code Quality**: ✅ Improved
+**Code Quality**: [x] Improved
 - Converted cryptic XXX/TODO/FIXME to clear explanatory comments
 - No functional changes, only documentation improvements
 - Future developers will understand design decisions
 
-**Maintainability**: ✅ Enhanced
+**Maintainability**: [x] Enhanced
 - 17 markers now have clear explanations
 - Reduced confusion about "why is this code like this?"
 - Better onboarding for new contributors
@@ -1004,7 +1004,7 @@ Total time: 00:00:00
 
 ---
 
-**Phase 2 Status**: ✅ COMPLETE
+**Phase 2 Status**: [x] COMPLETE
 **Markers Addressed**: 17/253 (7%)
 **Tests Passing**: 114/114 (100%)
 **Ready for Phase 3**: Yes
@@ -1014,10 +1014,10 @@ Total time: 00:00:00
 ## Phase 3 Progress Report (Partial Completion)
 
 **Date**: October 16, 2025
-**Status**: 🟡 IN PROGRESS (cpp/ modules completed, infer/graph pending)
+**Status**: [o] IN PROGRESS (cpp/ modules completed, infer/graph pending)
 **Time Spent**: ~3 hours
-**Tests**: ✅ All 114 unit tests passing
-**Build**: ✅ Code generation verified working
+**Tests**: [x] All 114 unit tests passing
+**Build**: [x] Code generation verified working
 
 ### Objectives
 
@@ -1029,9 +1029,9 @@ Phase 3 aims to systematically document low-priority markers by converting crypt
 
 ### Completed Work
 
-#### Task 1: cpp/ Module Markers ✅ (Partially Complete)
+#### Task 1: cpp/ Module Markers [x] (Partially Complete)
 
-**cpp/expressions.py (29/29 markers documented) ✅**
+**cpp/expressions.py (29/29 markers documented) [x]**
 
 Documented all expression code generation patterns:
 
@@ -1111,7 +1111,7 @@ Documented all expression code generation patterns:
     - Explained 2-element specialization
     - Documented template requirements
 
-**cpp/visitor.py (21/21 markers documented) ✅**
+**cpp/visitor.py (21/21 markers documented) [x]**
 
 Documented all visitor code generation patterns:
 
@@ -1185,8 +1185,8 @@ Documented all visitor code generation patterns:
     - Noted __ss_ prefix refactoring opportunity
 
 **Summary of cpp/ Work:**
-- ✅ **50 markers documented** in expressions.py and visitor.py
-- 🟡 **44 markers remaining** in other cpp/ modules:
+- [x] **50 markers documented** in expressions.py and visitor.py
+- [o] **44 markers remaining** in other cpp/ modules:
   - declarations.py: 13 markers
   - statements.py: 13 markers
   - helpers.py: 5 markers
@@ -1287,12 +1287,12 @@ def visit2(...):
 
 ### Verification Results
 
-**Unit Tests**: ✅ PASS (after each major change)
+**Unit Tests**: [x] PASS (after each major change)
 ```
 114 passed in 0.60s
 ```
 
-**Code Generation**: ✅ PASS
+**Code Generation**: [x] PASS
 ```
 Build succeeded for test.py
 Total time: 00:00:00
@@ -1300,13 +1300,13 @@ Total time: 00:00:00
 
 ### Impact Assessment
 
-**Code Quality**: ✅ Significantly Improved
+**Code Quality**: [x] Significantly Improved
 - Cryptic 1-3 word comments now have comprehensive explanations
 - Design rationales clearly documented
 - Alternative approaches noted with trade-offs
 - Language semantic differences explained
 
-**Maintainability**: ✅ Enhanced
+**Maintainability**: [x] Enhanced
 - 67 of 253 markers now have clear explanations (26% complete)
 - Future developers will understand "why" not just "what"
 - Reduced onboarding time for new contributors
@@ -1430,17 +1430,17 @@ Update todo list and progress counts regularly.
 ### Success Metrics
 
 **Quantitative:**
-- ✅ 67/253 markers addressed (26%)
-- ✅ 0 test failures
-- ✅ 0 build failures
-- ✅ 9 files improved
+- [x] 67/253 markers addressed (26%)
+- [x] 0 test failures
+- [x] 0 build failures
+- [x] 9 files improved
 
 **Qualitative:**
-- ✅ All documentation follows established patterns
-- ✅ Design decisions clearly explained
-- ✅ Alternative approaches documented
-- ✅ Future improvements noted
-- ✅ Code more maintainable
+- [x] All documentation follows established patterns
+- [x] Design decisions clearly explained
+- [x] Alternative approaches documented
+- [x] Future improvements noted
+- [x] Code more maintainable
 
 ### Recommended Next Steps
 
@@ -1480,7 +1480,7 @@ Phase 3 has successfully established a systematic approach to documenting techni
 
 With 26% of markers now documented, the foundation is set for completing the remaining 74%. The systematic approach, established patterns, and proven methodology make the remaining work straightforward.
 
-**Phase 3 Status**: 🟡 IN PROGRESS
+**Phase 3 Status**: [o] IN PROGRESS
 **Markers Addressed**: 67/253 (26%)
 **Tests Passing**: 114/114 (100%)
 **Ready to Continue**: Yes

@@ -36,10 +36,10 @@ This document summarizes all fixes completed on October 16, 2025, addressing cri
 4. **Maintainability**: More auditable security-conscious code
 
 ### Testing
-- ✅ `uv run shedskin build test` - Basic build works
-- ✅ `cd tests && uv run shedskin test --run test_builtin_enumerate` - Test runner works
-- ✅ CMake warnings eliminated (was showing path parsing issues)
-- ✅ 44 pytest tests pass
+- [x] `uv run shedskin build test` - Basic build works
+- [x] `cd tests && uv run shedskin test --run test_builtin_enumerate` - Test runner works
+- [x] CMake warnings eliminated (was showing path parsing issues)
+- [x] 44 pytest tests pass
 
 ## 2. Missing Import: ast_utils (From cpp.py Refactoring)
 
@@ -59,8 +59,8 @@ NameError: name 'ast_utils' is not defined
 Added `from .. import ast_utils` to imports in each file
 
 ### Testing
-- ✅ All 44 uses of `ast_utils` across modules now work correctly
-- ✅ Test suite passes without NameError
+- [x] All 44 uses of `ast_utils` across modules now work correctly
+- [x] Test suite passes without NameError
 
 ## 3. Missing Import: textwrap (From cpp.py Refactoring)
 
@@ -77,8 +77,8 @@ NameError: name 'textwrap' is not defined
 Added `import textwrap` to standard library imports
 
 ### Testing
-- ✅ `cd tests && uv run shedskin test --run test_builtins` - Passes
-- ✅ Comment generation works correctly
+- [x] `cd tests && uv run shedskin test --run test_builtins` - Passes
+- [x] Comment generation works correctly
 
 ## Summary of Changes by File
 
@@ -165,7 +165,7 @@ uv run pytest tests/test_builtins/ tests/test_control_for/ tests/test_builtin_en
 ## Documentation Updated
 
 1. **SECURITY_FIX_2025-10-16.md** - Detailed security fix documentation
-2. **CODE_REVIEW.md** - Updated to mark issues as ✅ FIXED:
+2. **CODE_REVIEW.md** - Updated to mark issues as [x] FIXED:
    - Command injection vulnerability
    - cpp.py monolithic module (already fixed)
    - Added missing import fixes to recent improvements
@@ -214,5 +214,5 @@ uv run pytest tests/test_builtins/ tests/test_control_for/ tests/test_builtin_en
 **Date**: 2025-10-16
 **Total Effort**: ~3 hours
 **Files Modified**: 6
-**Tests Passing**: ✅ All (44/44 pytest, 100% integration tests)
-**Security Status**: ✅ CRITICAL issues resolved
+**Tests Passing**: [x] All (44/44 pytest, 100% integration tests)
+**Security Status**: [x] CRITICAL issues resolved

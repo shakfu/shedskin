@@ -244,7 +244,7 @@ validate_input_file("malicious.exe", allowed_extensions=['.py'])
 
 ## Testing
 
-### Normal Operation ✅
+### Normal Operation [x]
 
 ```bash
 # Standard build
@@ -262,7 +262,7 @@ uv run shedskin test --run test_builtin_enumerate
 # Result: 100% tests passed, 0 tests failed out of 2
 ```
 
-### Attack Prevention ✅
+### Attack Prevention [x]
 
 ```bash
 # Path traversal attempt
@@ -443,11 +443,11 @@ Examples:
 ## Related Security Fixes
 
 Part of comprehensive security improvements:
-- ✅ Command injection (2025-10-16)
-- ✅ C-style cast safety (2025-10-16)
-- ✅ Error handling (2025-10-16)
-- ✅ Path traversal (2025-10-16) ← This fix
-- ⏭️ Input validation (future)
+- [x] Command injection (2025-10-16)
+- [x] C-style cast safety (2025-10-16)
+- [x] Error handling (2025-10-16)
+- [x] Path traversal (2025-10-16) ← This fix
+- ⏭ Input validation (future)
 
 ## Verification Commands
 
@@ -480,5 +480,5 @@ uv run shedskin test --run test_builtin_enumerate
 **Files Modified**: 2 (1 new)
 **Lines Added**: ~250
 **Attack Vectors Blocked**: 3
-**Tests passing**: ✅ 100%
-**Status**: ✅ COMPLETE
+**Tests passing**: [x] 100%
+**Status**: [x] COMPLETE

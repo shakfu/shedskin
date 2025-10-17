@@ -330,10 +330,10 @@ grep -rn "= (" shedskin/lib/builtin/{set,tuple}.hpp | \
 ## Related Issues
 
 Part of CODE_REVIEW.md Phase 1 - Security & Critical Fixes:
-- ✅ Command injection vulnerability (FIXED)
-- ✅ Error handling improvements (FIXED)
-- ✅ C-style casts in templates (FIXED)
-- ⏭️ Path traversal validation (NEXT)
+- [x] Command injection vulnerability (FIXED)
+- [x] Error handling improvements (FIXED)
+- [x] C-style casts in templates (FIXED)
+- ⏭ Path traversal validation (NEXT)
 
 ---
 
@@ -342,6 +342,6 @@ Part of CODE_REVIEW.md Phase 1 - Security & Critical Fixes:
 **Files Modified**: 3
 **C-style casts removed**: 5
 **Nullptr checks added**: 4
-**Tests passing**: ✅ 100%
+**Tests passing**: [x] 100%
 **Performance impact**: None measurable
-**Status**: ✅ COMPLETE
+**Status**: [x] COMPLETE
