@@ -1,5 +1,5 @@
 import datetime
-
+import sys
 
 
 def test_date():
@@ -13,7 +13,11 @@ def test_datetime_basic():
     b = datetime.datetime.now()
     assert a <= b
 
-    assert datetime.datetime.utcnow().date().year > 2020
+    # Use timezone-aware datetime for Python 3.13+
+    if sys.version_info >= (3, 13):
+        assert datetime.datetime.now(datetime.UTC).date().year > 2020
+    else:
+        assert datetime.datetime.utcnow().date().year > 2020
 
 
 class TZ2(datetime.tzinfo):

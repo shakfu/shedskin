@@ -1,9 +1,14 @@
 import array
 import os.path
+import sys
 
 
 def test_typecodes():
-    assert array.typecodes == 'bBuhHiIlLqQfd'
+    # Python 3.13+ added 'w' typecode for wchar_t
+    if sys.version_info >= (3, 13):
+        assert array.typecodes == 'bBuwhHiIlLqQfd'
+    else:
+        assert array.typecodes == 'bBuhHiIlLqQfd'
 
     arr = array.array('i')
     assert arr.typecode == 'i'

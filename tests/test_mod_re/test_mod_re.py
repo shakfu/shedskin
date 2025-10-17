@@ -41,8 +41,8 @@ def test_re_sub_fn():
     assert p.sub("****", txt, 1) == 'Call **** for printing, 49152 for user code.'
     assert p.sub(hexrepl, txt, 1) == 'Call 0xffd2 for printing, 49152 for user code.'
     assert p.sub(hexrepl, txt) == 'Call 0xffd2 for printing, 0xc000 for user code.'
-    assert re.sub(r"\d+", "****", txt, 2) == 'Call **** for printing, **** for user code.'
-    assert re.sub(r"\d+", hexrepl, txt, 2) == 'Call 0xffd2 for printing, 0xc000 for user code.'
+    assert re.sub(r"\d+", "****", txt, count=2) == 'Call **** for printing, **** for user code.'
+    assert re.sub(r"\d+", hexrepl, txt, count=2) == 'Call 0xffd2 for printing, 0xc000 for user code.'
 
 def test_re_subn():
     assert re.subn("(?i)b+", "x", "bbbb BBBB") == ('x x', 2)

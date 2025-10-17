@@ -16,7 +16,7 @@ docs/_build/
 *.so
 *.so.dSYM
 *.[hc]pp !lib/*.[hc]pp
-Makefile*
+# Makefile*
 
 # exclude build related files and folders
 build/
