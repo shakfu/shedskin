@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="680" height="278" viewBox="0 0 680 278" role="img" aria-label="loop: stop-the-world time per phase (mean of 5 runs)">
+
+<style>
+  .s { fill: #fcfcfb; } .t1 { fill: #0b0b0b; } .t2 { fill: #52514e; }
+  .g { stroke: #e4e3df; } .ax { stroke: #a3a29c; }
+  .c0 { fill: #2a78d6; } .c1 { fill: #eb6834; } .c2 { fill: #1baf7a; }
+  .gap { stroke: #fcfcfb; }
+  @media (prefers-color-scheme: dark) {
+    .s { fill: #1a1a19; } .t1 { fill: #f0efec; } .t2 { fill: #c3c2b7; }
+    .g { stroke: #2e2e2c; } .ax { stroke: #6b6a65; }
+    .c0 { fill: #3987e5; } .c1 { fill: #d95926; } .c2 { fill: #199e70; }
+    .gap { stroke: #1a1a19; }
+  }
+  text { font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; }
+</style>
+
+<rect class="s" width="680" height="278" rx="6"/>
+<text class="t1" x="16" y="26" font-size="15" font-weight="600">loop: stop-the-world time per phase (mean of 5 runs)</text>
+<rect class="c0" x="110" y="40" width="12" height="12" rx="3"/>
+<text class="t2" x="128" y="50" font-size="12">base</text>
+<rect class="c1" x="168" y="40" width="12" height="12" rx="3"/>
+<text class="t2" x="186" y="50" font-size="12">typed user classes</text>
+<rect class="c2" x="324" y="40" width="12" height="12" rx="3"/>
+<text class="t2" x="342" y="50" font-size="12">+ typed containers</text>
+<line class="g" x1="110.0" y1="64" x2="110.0" y2="244" stroke-width="1"/>
+<text class="t2" x="110.0" y="260" font-size="11" text-anchor="middle">0</text>
+<line class="g" x1="235.0" y1="64" x2="235.0" y2="244" stroke-width="1"/>
+<text class="t2" x="235.0" y="260" font-size="11" text-anchor="middle">750</text>
+<line class="g" x1="360.0" y1="64" x2="360.0" y2="244" stroke-width="1"/>
+<text class="t2" x="360.0" y="260" font-size="11" text-anchor="middle">1500</text>
+<line class="g" x1="485.0" y1="64" x2="485.0" y2="244" stroke-width="1"/>
+<text class="t2" x="485.0" y="260" font-size="11" text-anchor="middle">2250</text>
+<line class="g" x1="610.0" y1="64" x2="610.0" y2="244" stroke-width="1"/>
+<text class="t2" x="610.0" y="260" font-size="11" text-anchor="middle">3000</text>
+<text class="t2" x="610" y="274" font-size="11" text-anchor="end">ms, summed over 96-98 collections</text>
+<text class="t1" x="102" y="97.0" font-size="12" text-anchor="end">mark</text>
+<path class="c0" d="M110.0,70.0 h470.7 a4,4 0 0 1 4,4 v6.0 a4,4 0 0 1 -4,4 h-470.7 z"/>
+<text class="t2" x="590.7" y="81" font-size="11">2848</text>
+<path class="c1" d="M110.0,86.0 h386.5 a4,4 0 0 1 4,4 v6.0 a4,4 0 0 1 -4,4 h-386.5 z"/>
+<text class="t2" x="506.5" y="97" font-size="11">2343</text>
+<path class="c2" d="M110.0,102.0 h384.3 a4,4 0 0 1 4,4 v6.0 a4,4 0 0 1 -4,4 h-384.3 z"/>
+<text class="t2" x="504.3" y="113" font-size="11">2330</text>
+<text class="t1" x="102" y="155.0" font-size="12" text-anchor="end">initiate sweep</text>
+<path class="c0" d="M110.0,128.0 h19.3 a4,4 0 0 1 4,4 v6.0 a4,4 0 0 1 -4,4 h-19.3 z"/>
+<text class="t2" x="139.3" y="139" font-size="11">140</text>
+<path class="c1" d="M110.0,144.0 h51.5 a4,4 0 0 1 4,4 v6.0 a4,4 0 0 1 -4,4 h-51.5 z"/>
+<text class="t2" x="171.5" y="155" font-size="11">333</text>
+<path class="c2" d="M110.0,160.0 h38.8 a4,4 0 0 1 4,4 v6.0 a4,4 0 0 1 -4,4 h-38.8 z"/>
+<text class="t2" x="158.8" y="171" font-size="11">257</text>
+<text class="t1" x="102" y="213.0" font-size="12" text-anchor="end">other</text>
+<path class="c0" d="M110.0,186.0 h29.0 a4,4 0 0 1 4,4 v6.0 a4,4 0 0 1 -4,4 h-29.0 z"/>
+<text class="t2" x="149.0" y="197" font-size="11">198</text>
+<path class="c1" d="M110.0,202.0 h46.2 a4,4 0 0 1 4,4 v6.0 a4,4 0 0 1 -4,4 h-46.2 z"/>
+<text class="t2" x="166.2" y="213" font-size="11">301</text>
+<path class="c2" d="M110.0,218.0 h42.0 a4,4 0 0 1 4,4 v6.0 a4,4 0 0 1 -4,4 h-42.0 z"/>
+<text class="t2" x="162.0" y="229" font-size="11">276</text>
+<line class="ax" x1="110" y1="64" x2="110" y2="244" stroke-width="1"/>
+</svg>

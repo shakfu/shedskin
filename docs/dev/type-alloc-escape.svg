@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="680" height="186" viewBox="0 0 680 186" role="img" aria-label="pygmy: allocations by escape level (64x48 image, one render)">
+
+<style>
+  .s { fill: #fcfcfb; } .t1 { fill: #0b0b0b; } .t2 { fill: #52514e; }
+  .g { stroke: #e4e3df; } .ax { stroke: #a3a29c; }
+  .c0 { fill: #2a78d6; } .c1 { fill: #eb6834; } .c2 { fill: #1baf7a; }
+  .gap { stroke: #fcfcfb; }
+  @media (prefers-color-scheme: dark) {
+    .s { fill: #1a1a19; } .t1 { fill: #f0efec; } .t2 { fill: #c3c2b7; }
+    .g { stroke: #2e2e2c; } .ax { stroke: #6b6a65; }
+    .c0 { fill: #3987e5; } .c1 { fill: #d95926; } .c2 { fill: #199e70; }
+    .gap { stroke: #1a1a19; }
+  }
+  text { font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; }
+</style>
+
+<rect class="s" width="680" height="186" rx="6"/>
+<text class="t1" x="16" y="26" font-size="15" font-weight="600">pygmy: allocations by escape level (64x48 image, one render)</text>
+<line class="g" x1="150.0" y1="42" x2="150.0" y2="152" stroke-width="1"/>
+<text class="t2" x="150.0" y="168" font-size="11" text-anchor="middle">0</text>
+<line class="g" x1="265.0" y1="42" x2="265.0" y2="152" stroke-width="1"/>
+<text class="t2" x="265.0" y="168" font-size="11" text-anchor="middle">400</text>
+<line class="g" x1="380.0" y1="42" x2="380.0" y2="152" stroke-width="1"/>
+<text class="t2" x="380.0" y="168" font-size="11" text-anchor="middle">800</text>
+<line class="g" x1="495.0" y1="42" x2="495.0" y2="152" stroke-width="1"/>
+<text class="t2" x="495.0" y="168" font-size="11" text-anchor="middle">1200</text>
+<line class="g" x1="610.0" y1="42" x2="610.0" y2="152" stroke-width="1"/>
+<text class="t2" x="610.0" y="168" font-size="11" text-anchor="middle">1600</text>
+<text class="t2" x="610" y="182" font-size="11" text-anchor="end">thousand objects</text>
+<text class="t1" x="142" y="59.0" font-size="12" text-anchor="end">L0: dies in its function</text>
+<path class="c0" d="M150.0,48.0 h47.3 a4,4 0 0 1 4,4 v6.0 a4,4 0 0 1 -4,4 h-47.3 z"/>
+<text class="t2" x="207.3" y="59" font-size="11">178.5</text>
+<text class="t1" x="142" y="85.0" font-size="12" text-anchor="end">L1: returned once</text>
+<path class="c0" d="M150.0,74.0 h440.2 a4,4 0 0 1 4,4 v6.0 a4,4 0 0 1 -4,4 h-440.2 z"/>
+<text class="t2" x="600.2" y="85" font-size="11">1,545.2</text>
+<text class="t1" x="142" y="111.0" font-size="12" text-anchor="end">L2+: returned 2+ times</text>
+<path class="c0" d="M150.0,100.0 h144.7 a4,4 0 0 1 4,4 v6.0 a4,4 0 0 1 -4,4 h-144.7 z"/>
+<text class="t2" x="304.7" y="111" font-size="11">517.1</text>
+<text class="t1" x="142" y="137.0" font-size="12" text-anchor="end">escapes (93 objects)</text>
+<path class="c0" d="M150.0,126.0 h0.0 a0.013368749999999999,0.013368749999999999 0 0 1 0.013368749999999999,0.013368749999999999 v14.0 a0.013368749999999999,0.013368749999999999 0 0 1 -0.013368749999999999,0.013368749999999999 h-0.0 z"/>
+<text class="t2" x="156.0" y="137" font-size="11">0.1</text>
+<line class="ax" x1="150" y1="42" x2="150" y2="152" stroke-width="1"/>
+</svg>

@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="680" height="278" viewBox="0 0 680 278" role="img" aria-label="loop: libgc instructions by phase (callgrind)">
+
+<style>
+  .s { fill: #fcfcfb; } .t1 { fill: #0b0b0b; } .t2 { fill: #52514e; }
+  .g { stroke: #e4e3df; } .ax { stroke: #a3a29c; }
+  .c0 { fill: #2a78d6; } .c1 { fill: #eb6834; } .c2 { fill: #1baf7a; }
+  .gap { stroke: #fcfcfb; }
+  @media (prefers-color-scheme: dark) {
+    .s { fill: #1a1a19; } .t1 { fill: #f0efec; } .t2 { fill: #c3c2b7; }
+    .g { stroke: #2e2e2c; } .ax { stroke: #6b6a65; }
+    .c0 { fill: #3987e5; } .c1 { fill: #d95926; } .c2 { fill: #199e70; }
+    .gap { stroke: #1a1a19; }
+  }
+  text { font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; }
+</style>
+
+<rect class="s" width="680" height="278" rx="6"/>
+<text class="t1" x="16" y="26" font-size="15" font-weight="600">loop: libgc instructions by phase (callgrind)</text>
+<rect class="c0" x="110" y="40" width="12" height="12" rx="3"/>
+<text class="t2" x="128" y="50" font-size="12">base</text>
+<rect class="c1" x="168" y="40" width="12" height="12" rx="3"/>
+<text class="t2" x="186" y="50" font-size="12">typed user classes</text>
+<rect class="c2" x="324" y="40" width="12" height="12" rx="3"/>
+<text class="t2" x="342" y="50" font-size="12">+ typed containers</text>
+<line class="g" x1="110.0" y1="64" x2="110.0" y2="244" stroke-width="1"/>
+<text class="t2" x="110.0" y="260" font-size="11" text-anchor="middle">0</text>
+<line class="g" x1="235.0" y1="64" x2="235.0" y2="244" stroke-width="1"/>
+<text class="t2" x="235.0" y="260" font-size="11" text-anchor="middle">7.5</text>
+<line class="g" x1="360.0" y1="64" x2="360.0" y2="244" stroke-width="1"/>
+<text class="t2" x="360.0" y="260" font-size="11" text-anchor="middle">15</text>
+<line class="g" x1="485.0" y1="64" x2="485.0" y2="244" stroke-width="1"/>
+<text class="t2" x="485.0" y="260" font-size="11" text-anchor="middle">22.5</text>
+<line class="g" x1="610.0" y1="64" x2="610.0" y2="244" stroke-width="1"/>
+<text class="t2" x="610.0" y="260" font-size="11" text-anchor="middle">30</text>
+<text class="t2" x="610" y="274" font-size="11" text-anchor="end">billion instructions</text>
+<text class="t1" x="102" y="97.0" font-size="12" text-anchor="end">mark</text>
+<path class="c0" d="M110.0,70.0 h422.0 a4,4 0 0 1 4,4 v6.0 a4,4 0 0 1 -4,4 h-422.0 z"/>
+<text class="t2" x="542.0" y="81" font-size="11">25.56</text>
+<path class="c1" d="M110.0,86.0 h276.2 a4,4 0 0 1 4,4 v6.0 a4,4 0 0 1 -4,4 h-276.2 z"/>
+<text class="t2" x="396.2" y="97" font-size="11">16.81</text>
+<path class="c2" d="M110.0,102.0 h376.7 a4,4 0 0 1 4,4 v6.0 a4,4 0 0 1 -4,4 h-376.7 z"/>
+<text class="t2" x="496.7" y="113" font-size="11">22.84</text>
+<text class="t1" x="102" y="155.0" font-size="12" text-anchor="end">sweep</text>
+<path class="c0" d="M110.0,128.0 h27.7 a4,4 0 0 1 4,4 v6.0 a4,4 0 0 1 -4,4 h-27.7 z"/>
+<text class="t2" x="147.7" y="139" font-size="11">1.90</text>
+<path class="c1" d="M110.0,144.0 h2.1 a2.0833333333333335,2.0833333333333335 0 0 1 2.0833333333333335,2.0833333333333335 v9.8 a2.0833333333333335,2.0833333333333335 0 0 1 -2.0833333333333335,2.0833333333333335 h-2.1 z"/>
+<text class="t2" x="120.2" y="155" font-size="11">0.25</text>
+<path class="c2" d="M110.0,160.0 h2.3 a2.333333333333334,2.333333333333334 0 0 1 2.333333333333334,2.333333333333334 v9.3 a2.333333333333334,2.333333333333334 0 0 1 -2.333333333333334,2.333333333333334 h-2.3 z"/>
+<text class="t2" x="120.7" y="171" font-size="11">0.28</text>
+<text class="t1" x="102" y="213.0" font-size="12" text-anchor="end">alloc</text>
+<path class="c0" d="M110.0,186.0 h159.7 a4,4 0 0 1 4,4 v6.0 a4,4 0 0 1 -4,4 h-159.7 z"/>
+<text class="t2" x="279.7" y="197" font-size="11">9.82</text>
+<path class="c1" d="M110.0,202.0 h185.5 a4,4 0 0 1 4,4 v6.0 a4,4 0 0 1 -4,4 h-185.5 z"/>
+<text class="t2" x="305.5" y="213" font-size="11">11.37</text>
+<path class="c2" d="M110.0,218.0 h171.5 a4,4 0 0 1 4,4 v6.0 a4,4 0 0 1 -4,4 h-171.5 z"/>
+<text class="t2" x="291.5" y="229" font-size="11">10.53</text>
+<line class="ax" x1="110" y1="64" x2="110" y2="244" stroke-width="1"/>
+</svg>

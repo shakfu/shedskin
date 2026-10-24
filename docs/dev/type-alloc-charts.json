@@ -1,0 +1,146 @@
+{
+ "type-alloc-survey.svg": {
+  "title": "libgc pause time as share of wall time",
+  "unit": "% of wall time",
+  "fmt": "{:.1f}%",
+  "label_w": 90,
+  "categories": [
+   "loop",
+   "pygmy",
+   "chaos",
+   "kmeanspp",
+   "life",
+   "bh",
+   "pystone",
+   "sat",
+   "block",
+   "sudoku1",
+   "go",
+   "mao",
+   "voronoi",
+   "genetic",
+   "timsort",
+   "richards"
+  ],
+  "series": [
+   [
+    "pause share",
+    [
+     25.1,
+     16.0,
+     10.4,
+     9.5,
+     4.8,
+     4.6,
+     4.6,
+     3.3,
+     3.3,
+     2.9,
+     2.6,
+     0.7,
+     0.6,
+     0.1,
+     0.1,
+     0.0
+    ]
+   ]
+  ]
+ },
+ "type-alloc-phases.svg": {
+  "title": "loop: stop-the-world time per phase (mean of 5 runs)",
+  "unit": "ms, summed over 96-98 collections",
+  "fmt": "{:.0f}",
+  "label_w": 110,
+  "categories": [
+   "mark",
+   "initiate sweep",
+   "other"
+  ],
+  "series": [
+   [
+    "base",
+    [
+     2848,
+     140,
+     198
+    ]
+   ],
+   [
+    "typed user classes",
+    [
+     2343,
+     333,
+     301
+    ]
+   ],
+   [
+    "+ typed containers",
+    [
+     2330,
+     257,
+     276
+    ]
+   ]
+  ]
+ },
+ "type-alloc-ir.svg": {
+  "title": "loop: libgc instructions by phase (callgrind)",
+  "unit": "billion instructions",
+  "fmt": "{:.2f}",
+  "label_w": 110,
+  "categories": [
+   "mark",
+   "sweep",
+   "alloc"
+  ],
+  "series": [
+   [
+    "base",
+    [
+     25.56,
+     1.9,
+     9.82
+    ]
+   ],
+   [
+    "typed user classes",
+    [
+     16.81,
+     0.25,
+     11.37
+    ]
+   ],
+   [
+    "+ typed containers",
+    [
+     22.84,
+     0.28,
+     10.53
+    ]
+   ]
+  ]
+ },
+ "type-alloc-escape.svg": {
+  "title": "pygmy: allocations by escape level (64x48 image, one render)",
+  "unit": "thousand objects",
+  "fmt": "{:,.1f}",
+  "label_w": 150,
+  "categories": [
+   "L0: dies in its function",
+   "L1: returned once",
+   "L2+: returned 2+ times",
+   "escapes (93 objects)"
+  ],
+  "series": [
+   [
+    "objects",
+    [
+     178.549,
+     1545.189,
+     517.088,
+     0.093
+    ]
+   ]
+  ]
+ }
+}
